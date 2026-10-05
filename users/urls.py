@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 from . import views
 
 app_name = 'users'
@@ -8,6 +9,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login_view, name='login'),
     path('privacy-policy/', views.PrivacyPolicyView.as_view(), name='privacy_policy'),
+    path('cookie-policy/', TemplateView.as_view(template_name='users/cookie_policy.html'), name='cookie_policy'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('profile/<int:pk>/', views.AdminUserProfileView.as_view(), name='admin_profile'),  # profilo di altri utenti (admin only)
