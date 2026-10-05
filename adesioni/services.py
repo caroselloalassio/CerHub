@@ -1,6 +1,7 @@
 """Logica delle adesioni online: PDF, firma, creazione dell'utente, email."""
 import io
 import logging
+import os
 from datetime import timedelta
 
 from django.conf import settings
@@ -311,6 +312,11 @@ def elimina(adesione):
     for campo in (adesione.doc_fronte, adesione.doc_retro, adesione.pdf_modulo, adesione.pdf_firmato):
         if campo:
             campo.delete(save=False)
+    cartella = os.path.join(settings.MEDIA_ROOT, 'adesioni', str(adesione.token))
+    try:
+        os.rmdir(cartella)  # solo se è rimasta vuota
+    except OSError:
+        pass
     adesione.delete()
 
 

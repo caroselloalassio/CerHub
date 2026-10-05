@@ -65,7 +65,7 @@
     {% if user.is_authenticated %}
       <p class="mb-2">Ritrovi sempre questi documenti in <a href="{% url 'adesioni:mie' %}">Le mie adesioni</a>.</p>
     {% else %}
-      <p class="mb-2">Abbiamo creato il tuo accesso all'area soci di CER Hub, dove ritrovi sempre i documenti firmati. Nell'e-mail che ti abbiamo inviato c'è il link per scegliere la password.</p>
+      <p class="mb-2">Ritrovi sempre i documenti firmati nell'area soci di CER Hub. Se è la tua prima volta, nell'e-mail che ti abbiamo inviato c'è il link per scegliere la password.</p>
       <a class="btn btn-outline-secondary" href="{% url 'users:login' %}">Vai all'accesso</a>
     {% endif %}
   </div>

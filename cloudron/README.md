@@ -27,6 +27,28 @@ Il client MQTT parte dentro il processo web (un solo worker gunicorn con più
 thread, così esiste un solo client) quando nel pannello è configurato un broker
 attivo.
 
+## Adesioni online e firma elettronica
+
+L'app `adesioni` pubblica la domanda di adesione su `/adesione/` (privati e ditte
+individuali, aziende e associazioni). Alla conferma genera il PDF della domanda e
+lo manda in firma a Documenso, l'istanza dell'associazione su `firme.cerhub.it`
+(app Cloudron, versione gratuita), tramite le API v2. Dopo la firma scarica il
+documento firmato, crea l'utente dell'aderente e avvisa per email l'aderente e
+l'associazione. Le domande si esaminano da `/ceradmin/adesioni/adesione/`.
+
+- Il token API di Documenso sta in `/app/data/env.sh` (`DOCUMENSO_API_TOKEN`).
+  Senza token l'adesione online mostra "in fase di attivazione".
+- File delle domande (PDF, foto del documento) in `/app/data/media/adesioni/`,
+  serviti solo dall'app a chi ne ha diritto.
+- Le domande compilate e non firmate vengono eliminate dopo 30 giorni.
+
+## Posta
+
+Il dominio `cerhub.it` esce da un relay autenticato come `noreply@cerhub.it`:
+il mittente dell'app in Cloudron (app → Email) deve restare `noreply@cerhub.it`,
+altrimenti il server di posta rifiuta i messaggi ("Mittente non consentito").
+Lo stesso vale per `firme.cerhub.it`.
+
 ## Aggiornamenti
 
 Sul server un timer systemd (`cerhub-update.timer`, ogni notte) esegue

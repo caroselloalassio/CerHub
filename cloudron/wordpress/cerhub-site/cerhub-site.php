@@ -2,7 +2,7 @@
 /**
  * Plugin Name: CER Hub – Privacy e consenso cookie
  * Description: Banner di consenso senza servizi esterni, Google Analytics caricato solo dopo il consenso, protezione antispam del modulo di contatto senza servizi esterni, link a privacy e cookie policy nel piè di pagina.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: CER Hub
  * License: GPL-2.0-or-later
  */
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CERHUB_SITE_VERSION', '1.1.0' );
+define( 'CERHUB_SITE_VERSION', '1.1.1' );
 
 function cerhub_site_page_url( $slug ) {
 	$page = get_page_by_path( $slug );
@@ -80,7 +80,8 @@ function cerhub_site_antispam_fields( $html ) {
 			. '<label>Lascia vuoto questo campo <input type="text" name="cerhub_sito" value="" tabindex="-1" autocomplete="off"></label></p>'
 			. '<input type="hidden" name="cerhub_ts" value="">'
 			. '<script>(function(){var s=document.currentScript,f=s&&s.parentNode;while(f&&f.tagName!=="FORM"){f=f.parentNode;}'
-			. 'if(f&&f.elements.cerhub_ts){f.elements.cerhub_ts.value=String(Date.now());}})();</script>';
+			. 'if(!f||!f.elements.cerhub_ts){return;}function t(){f.elements.cerhub_ts.value=String(Date.now());}t();'
+			. 'f.addEventListener("reset",function(){setTimeout(t,0);});})();</script>';
 	} catch ( \Throwable $e ) {
 		return $html;
 	}

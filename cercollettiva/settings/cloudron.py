@@ -94,8 +94,12 @@ if os.getenv('CLOUDRON_MAIL_SMTP_SERVER'):
     EMAIL_HOST_PASSWORD = os.getenv('CLOUDRON_MAIL_SMTP_PASSWORD', '')
     EMAIL_USE_TLS = False
     EMAIL_USE_SSL = False
-    DEFAULT_FROM_EMAIL = os.getenv('CLOUDRON_MAIL_FROM', f'noreply@{APP_DOMAIN}')
-    SERVER_EMAIL = DEFAULT_FROM_EMAIL
+    # L'indirizzo del mittente è quello impostato in Cloudron per l'app (deve essere una
+    # casella esistente del dominio: il server di posta dell'associazione rifiuta le altre).
+    _mail_from = os.getenv('CLOUDRON_MAIL_FROM', f'noreply@{APP_DOMAIN}')
+    _mail_name = os.getenv('CLOUDRON_MAIL_FROM_DISPLAY_NAME', '').replace('"', '')
+    DEFAULT_FROM_EMAIL = f'"{_mail_name}" <{_mail_from}>' if _mail_name else _mail_from
+    SERVER_EMAIL = _mail_from
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
