@@ -8,9 +8,9 @@
 /* Integrazione del design CerCollettiva nell'admin Django */
 :root {
     /* Brand Colors from CerCollettiva */
-    --cer-primary: #2563eb;
-    --cer-primary-dark: #1d4ed8;
-    --cer-primary-light: #3b82f6;
+    --cer-primary: #00a47f;
+    --cer-primary-dark: #00796b;
+    --cer-primary-light: #2bbd9a;
     --cer-secondary: #64748b;
     --cer-success: #10b981;
     --cer-warning: #f59e0b;
@@ -31,7 +31,7 @@
     --cer-gray-900: #0f172a;
     
     /* Energy Theme */
-    --energy-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --energy-gradient: linear-gradient(135deg, #00a47f 0%, #00796b 100%);
     --solar-gradient: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
     --green-gradient: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
 }
@@ -167,7 +167,7 @@ input, select, textarea {
 
 input:focus, select:focus, textarea:focus {
     border-color: var(--cer-primary) !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(0, 164, 127, 0.1) !important;
     outline: none !important;
 }
 
@@ -266,7 +266,7 @@ input:focus, select:focus, textarea:focus {
 {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">
-        CerCollettiva Admin
+        CER Hub · Amministrazione
     </a>
 </h1>
 {% endblock %}

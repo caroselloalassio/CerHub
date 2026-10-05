@@ -129,7 +129,7 @@ class InitialSuperUserForm(UserCreationForm):
                     <div class="card-body">
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Benvenuto! Per iniziare a usare CerCollettiva, crea il primo account amministratore.
+                            Benvenuto! Per iniziare a usare CER Hub, crea il primo account amministratore.
                         </div>
             """),
             Row(

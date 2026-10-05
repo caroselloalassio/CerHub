@@ -45,7 +45,7 @@ class InitialSetupView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            'title': 'Setup Iniziale CerCollettiva',
+            'title': 'Setup Iniziale CER Hub',
             'show_navbar': False,  # Nasconde la navbar durante il setup
             'is_setup': True,
         })

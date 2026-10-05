@@ -1,0 +1,111 @@
+/* Identità visiva CER Hub: colori del sito www.cerhub.it
+   verde #00a47f · verde scuro #00796b · corallo #fd7563 · testo #272727 */
+:root {
+    --cerhub-green: #00a47f;
+    --cerhub-green-dark: #00796b;
+    --cerhub-coral: #fd7563;
+    --cerhub-ink: #272727;
+
+    --cer-primary: #00a47f;
+    --cer-primary-dark: #00796b;
+    --cer-primary-light: #2bbd9a;
+    --cer-accent: #fd7563;
+    --accent-color: #00a47f;
+    --accent-secondary: #00796b;
+    --energy-gradient: linear-gradient(135deg, #00a47f 0%, #00796b 100%);
+
+    --bs-primary: #00a47f;
+    --bs-primary-rgb: 0, 164, 127;
+    --bs-link-color: #00796b;
+    --bs-link-color-rgb: 0, 121, 107;
+    --bs-link-hover-color: #005f54;
+    --bs-link-hover-color-rgb: 0, 95, 84;
+    --bs-primary-text-emphasis: #005f54;
+    --bs-primary-bg-subtle: #e0f5ef;
+    --bs-primary-border-subtle: #9fdccb;
+    --bs-focus-ring-color: rgba(0, 164, 127, 0.25);
+}
+
+.btn-primary {
+    --bs-btn-bg: #00a47f;
+    --bs-btn-border-color: #00a47f;
+    --bs-btn-hover-bg: #00796b;
+    --bs-btn-hover-border-color: #00796b;
+    --bs-btn-active-bg: #00695d;
+    --bs-btn-active-border-color: #00695d;
+    --bs-btn-disabled-bg: #00a47f;
+    --bs-btn-disabled-border-color: #00a47f;
+    --bs-btn-focus-shadow-rgb: 0, 164, 127;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: #00796b;
+    --bs-btn-border-color: #00a47f;
+    --bs-btn-hover-bg: #00a47f;
+    --bs-btn-hover-border-color: #00a47f;
+    --bs-btn-active-bg: #00796b;
+    --bs-btn-active-border-color: #00796b;
+    --bs-btn-focus-shadow-rgb: 0, 164, 127;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: #6fcdb6;
+    box-shadow: 0 0 0 0.25rem rgba(0, 164, 127, 0.2);
+}
+
+.form-check-input:checked {
+    background-color: #00a47f;
+    border-color: #00a47f;
+}
+
+.nav-pills {
+    --bs-nav-pills-link-active-bg: #00a47f;
+}
+
+.pagination {
+    --bs-pagination-color: #00796b;
+    --bs-pagination-hover-color: #005f54;
+    --bs-pagination-active-bg: #00a47f;
+    --bs-pagination-active-border-color: #00a47f;
+}
+
+.progress {
+    --bs-progress-bar-bg: #00a47f;
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: #00a47f;
+}
+
+/* Logo nella barra di navigazione */
+.navbar-brand .cerhub-logo {
+    height: 34px;
+    width: auto;
+    display: block;
+}
+
+@media (max-width: 576px) {
+    .navbar-brand .cerhub-logo {
+        height: 28px;
+    }
+}
+
+/* Il marchio è un'immagine: niente testo sfumato trasparente */
+.cer-navbar .navbar-brand {
+    background: none;
+    -webkit-text-fill-color: initial;
+}
+
+.cerhub-footer-logo {
+    height: 26px;
+    width: auto;
+}
+
+/* Filetto corallo sotto i titoli principali, come sul sito */
+.text-gradient {
+    background: none;
+    -webkit-text-fill-color: #00796b;
+    color: #00796b;
+}

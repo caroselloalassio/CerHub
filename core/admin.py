@@ -19,9 +19,9 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 
 class CERAdminSite(admin.AdminSite):
-    site_header = 'CerCollettiva Administration'
-    site_title = 'CerCollettiva Admin'
-    index_title = 'Amministrazione CerCollettiva'
+    site_header = 'CER Hub · Amministrazione'
+    site_title = 'CER Hub Admin'
+    index_title = 'Amministrazione CER Hub'
 
     def get_urls(self):
         urls = super().get_urls()

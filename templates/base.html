@@ -5,12 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CerCollettiva{% endblock %}</title>
+    <title>{% block title %}CER Hub{% endblock %}</title>
     
     <!-- Meta Tags -->
-    <meta name="description" content="{% block meta_description %}CerCollettiva - Piattaforma per la gestione delle Comunità Energetiche Rinnovabili{% endblock %}">
+    <meta name="description" content="{% block meta_description %}CER Hub - Piattaforma per la gestione delle Comunità Energetiche Rinnovabili{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}energia rinnovabile, CER, comunità energetiche, sostenibilità{% endblock %}">
-    <meta name="author" content="CerCollettiva Team">
+    <meta name="author" content="CER Hub">
     
     <!-- Favicon -->
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
@@ -27,9 +27,9 @@
     <style>
         :root {
             /* Brand Colors */
-            --cer-primary: #2563eb;
-            --cer-primary-dark: #1d4ed8;
-            --cer-primary-light: #3b82f6;
+            --cer-primary: #00a47f;
+            --cer-primary-dark: #00796b;
+            --cer-primary-light: #2bbd9a;
             --cer-secondary: #64748b;
             --cer-success: #10b981;
             --cer-warning: #f59e0b;
@@ -59,7 +59,7 @@
             --cer-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             
             /* Energy Theme */
-            --energy-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --energy-gradient: linear-gradient(135deg, #00a47f 0%, #00796b 100%);
             --solar-gradient: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
             --green-gradient: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
         }
@@ -205,7 +205,7 @@
         
         .form-control:focus, .form-select:focus {
             border-color: var(--cer-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 164, 127, 0.1);
         }
         
         .form-label {
@@ -430,7 +430,7 @@
         }
         
         .badge-cer-primary {
-            background-color: rgba(37, 99, 235, 0.1);
+            background-color: rgba(0, 164, 127, 0.1);
             color: var(--cer-primary);
         }
         
@@ -490,6 +490,8 @@
     </style>
     
     {% block extra_css %}{% endblock %}
+    <!-- Identità visiva CER Hub -->
+    <link rel="stylesheet" href="{% static 'css/cerhub-brand.css' %}">
 </head>
 <body class="{% if show_navbar == False %}hide-navbar{% endif %}">
     <!-- Navbar -->
@@ -497,8 +499,7 @@
     <nav class="navbar navbar-expand-lg cer-navbar">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
-                <i class="fas fa-solar-panel me-2"></i>
-                CerCollettiva
+                <img src="{% static 'images/cerhub-logo.png' %}" alt="CER Hub" class="cerhub-logo">
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -627,22 +628,21 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-3">
-                        <i class="fas fa-solar-panel me-2 text-gradient" style="font-size: 1.5rem;"></i>
-                        <h5 class="mb-0">CerCollettiva</h5>
+                        <img src="{% static 'images/cerhub-logo.png' %}" alt="CER Hub" class="cerhub-footer-logo">
                     </div>
                     <p class="mb-2">Piattaforma per la gestione delle Comunità Energetiche Rinnovabili</p>
-                    <p class="mb-0"><small>&copy; {% now "Y" %} CerCollettiva. Tutti i diritti riservati.</small></p>
+                    <p class="mb-0"><small>&copy; {% now "Y" %} CER Hub. Tutti i diritti riservati.</small></p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="mb-3">
-                        <a href="#" class="text-decoration-none me-3">
-                            <i class="fab fa-github me-1"></i>GitHub
+                        <a href="https://www.cerhub.it" class="text-decoration-none me-3">
+                            <i class="fas fa-globe me-1"></i>www.cerhub.it
                         </a>
-                        <a href="#" class="text-decoration-none">
-                            <i class="fas fa-book me-1"></i>Documentazione
+                        <a href="{% url 'users:privacy_policy' %}" class="text-decoration-none">
+                            <i class="fas fa-shield-alt me-1"></i>Privacy
                         </a>
                     </div>
-                    <p class="mb-0"><small>Energia sostenibile per tutti</small></p>
+                    <p class="mb-0"><small>Basato sul software open source <a href="https://github.com/atomozero/CerCollettiva" class="text-decoration-none">CerCollettiva</a></small></p>
                 </div>
             </div>
         </div>

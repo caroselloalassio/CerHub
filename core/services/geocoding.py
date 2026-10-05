@@ -23,7 +23,7 @@ class GeocodingService:
         self.timeout = settings.GEOCODING_SETTINGS.get('TIMEOUT', 5)
         self.max_retries = settings.GEOCODING_SETTINGS.get('MAX_RETRIES', 2)
         self.cache_timeout = settings.GEOCODING_SETTINGS.get('CACHE_TIMEOUT', 86400) # 24h
-        self.user_agent = 'CerCollettiva/1.0 (+https://cercollettiva.it)'
+        self.user_agent = 'CerHub/1.0 (+https://app.cerhub.it)'
 
     def get_coordinates(self, address: str) -> Optional[Tuple[float, float]]:
         """
