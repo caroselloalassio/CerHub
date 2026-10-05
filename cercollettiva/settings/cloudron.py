@@ -120,8 +120,9 @@ GEOCODING_SETTINGS = {
     'CACHE_TIMEOUT': 86400,
 }
 
-# --- Logging: tutto su stdout/stderr (raccolto da Cloudron) --------------------
-LOGS_DIR = RUN_DIR / 'logs'
+# --- Logging: su stdout/stderr (raccolto da Cloudron); i file scritti
+# direttamente dal codice (accessi, MQTT) finiscono in /app/data/logs ---------
+LOGS_DIR = DATA_DIR / 'logs'
 
 LOGGING = {
     'version': 1,

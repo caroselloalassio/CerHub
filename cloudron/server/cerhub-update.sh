@@ -112,9 +112,10 @@ docker push "$REG:$NEWVER" || fail "push dell'immagine $NEWVER non riuscito"
 
 # --- Installazione / aggiornamento -------------------------------------------
 cd "$BUILD"
-if [ "$REASON" = install ]; then
+if [ "$REASON" = install ] && ! cloudron status --app "$APP" >/dev/null 2>&1; then
     cloudron install --image "$REG:$NEWVER" --location "$APP" || fail "cloudron install non riuscito"
 else
+    # anche per --install, se l'app esiste già (installazione precedente non completata)
     cloudron update --image "$REG:$NEWVER" --app "$APP" || echo "cloudron update ha segnalato un errore, verifico lo stato dell'app"
 fi
 

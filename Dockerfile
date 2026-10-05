@@ -19,9 +19,9 @@ RUN python3 -m venv /app/venv && \
 COPY . /app/code
 
 # Il filesystem dell'app è in sola lettura: le cartelle scrivibili diventano
-# collegamenti verso /app/data (persistente, nei backup) e /run (temporanea).
+# collegamenti verso /app/data (persistente, nei backup).
 RUN rm -rf /app/code/logs /app/code/media && \
-    ln -s /run/cerhub/logs /app/code/logs && \
+    ln -s /app/data/logs /app/code/logs && \
     ln -s /app/data/media /app/code/media && \
     for app in users core energy documents; do \
         rm -rf /app/code/$app/migrations && \
@@ -29,7 +29,7 @@ RUN rm -rf /app/code/logs /app/code/media && \
     done
 
 # File statici raccolti in fase di build (serviti da WhiteNoise)
-RUN mkdir -p /run/cerhub/logs /run/cerhub/tmp /app/data/media && \
+RUN mkdir -p /run/cerhub/tmp /app/data/media /app/data/logs && \
     SECRET_KEY=build \
     FIELD_ENCRYPTION_KEY="$(python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())')" \
     CLOUDRON_POSTGRESQL_DATABASE=x CLOUDRON_POSTGRESQL_USERNAME=x \
@@ -37,7 +37,7 @@ RUN mkdir -p /run/cerhub/logs /run/cerhub/tmp /app/data/media && \
     CLOUDRON_REDIS_URL=redis://localhost:6379 \
     DJANGO_SETTINGS_MODULE=cercollettiva.settings.cloudron \
     python3 manage.py collectstatic --noinput && \
-    rm -rf /run/cerhub /app/data/media && \
+    rm -rf /run/cerhub /app/data/media /app/data/logs && \
     chmod +x /app/code/cloudron/start.sh
 
 EXPOSE 8000

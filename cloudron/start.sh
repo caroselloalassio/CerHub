@@ -7,7 +7,7 @@ RUN=/run/cerhub
 APPS="users core energy documents"
 
 echo "==> Preparazione cartelle"
-mkdir -p "$RUN/logs" "$RUN/tmp" "$DATA/media/documents/gaudi"
+mkdir -p "$RUN/tmp" "$DATA/logs" "$DATA/media/documents/gaudi"
 for app in $APPS; do
     mkdir -p "$DATA/migrations/$app"
     touch "$DATA/migrations/$app/__init__.py"

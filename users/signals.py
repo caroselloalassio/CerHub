@@ -12,7 +12,7 @@ logger = logging.getLogger('access_logger')
 logger.setLevel(logging.INFO)
 
 # Handler per file
-file_handler = logging.FileHandler('access_logs.log')
+file_handler = logging.FileHandler(settings.BASE_DIR / 'logs' / 'access_logs.log')
 file_handler.setLevel(logging.INFO)
 
 # Handler per console (utile in development)
