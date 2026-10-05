@@ -201,11 +201,11 @@ class CustomUser(AbstractUser):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(legal_type__in=['PRIVATE', 'BUSINESS', 'ASSOCIATION', 'CHURCH', 'PUBLIC']),
+                condition=models.Q(legal_type__in=['PRIVATE', 'BUSINESS', 'ASSOCIATION', 'CHURCH', 'PUBLIC']),
                 name='valid_legal_type'
             ),
             models.CheckConstraint(
-                check=models.Q(profit_type__in=['PROFIT', 'NON_PROFIT']),
+                condition=models.Q(profit_type__in=['PROFIT', 'NON_PROFIT']),
                 name='valid_profit_type'
             ),
         ]

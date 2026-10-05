@@ -4,7 +4,7 @@ set -eu
 
 DATA=/app/data
 RUN=/run/cerhub
-APPS="users core energy documents"
+APPS="users core energy documents adesioni"
 
 echo "==> Preparazione cartelle"
 mkdir -p "$RUN/tmp" "$DATA/logs" "$DATA/media/documents/gaudi"
@@ -33,6 +33,9 @@ if [[ ! -f "$DATA/env.sh" ]]; then
 # export MQTT_USER=
 # export MQTT_PASS=
 # export MQTT_TLS=False
+#
+# Firma elettronica delle adesioni online (Documenso su firme.cerhub.it):
+# export DOCUMENSO_API_TOKEN=
 EOF
 fi
 

@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import PermissionDenied
 import json
 
 from ..models import CERConfiguration, CERMembership, MembershipCard, MemberRegistry
@@ -82,30 +83,88 @@ class CERFeesManagementView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 class MembershipFeeDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
-    """Vista per gestire una singola quota associativa"""
+    """
+    Dettaglio di una singola quota associativa.
+
+    Lo staff può vedere e modificare tutte le quote; il socio può solo
+    consultare la propria (sola lettura).
+    """
     model = MembershipCard
     template_name = 'core/membership_fee_detail.html'
     context_object_name = 'card'
-    
+
+    def get_queryset(self):
+        return MembershipCard.objects.select_related(
+            'membership__user',
+            'membership__cer_configuration'
+        )
+
+    def get_object(self, queryset=None):
+        # Evita query ripetute (test_func, get, get_context_data)
+        if not hasattr(self, '_card'):
+            self._card = super().get_object(queryset)
+        return self._card
+
     def test_func(self):
-        return self.request.user.is_staff
-    
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return True
+        return self.get_object().membership.user_id == user.pk
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         card = self.get_object()
-        
+        user = self.request.user
+        can_manage = user.is_staff or user.is_superuser
+
         context.update({
             'cer': card.membership.cer_configuration,
             'membership': card.membership,
-            'payment_methods': [
-                ('CASH', 'Contanti'),
-                ('BANK_TRANSFER', 'Bonifico'),
-                ('CARD', 'Carta'),
-                ('OTHER', 'Altro')
-            ]
+            'member': card.membership.user,
+            'can_manage': can_manage,
         })
-        
+        if can_manage and 'form' not in context:
+            context['form'] = MembershipFeeForm(
+                card=card,
+                initial={'payment_method': card.payment_method or 'BANK_TRANSFER'}
+            )
+
         return context
+
+    def post(self, request, *args, **kwargs):
+        """Aggiornamento della quota (solo staff)"""
+        if not (request.user.is_staff or request.user.is_superuser):
+            raise PermissionDenied
+
+        self.object = card = self.get_object()
+        action = request.POST.get('action')
+
+        if action == 'mark_unpaid':
+            card.membership_fee_paid = False
+            card.fee_payment_date = None
+            card.payment_method = ''
+            card.save(update_fields=['membership_fee_paid', 'fee_payment_date', 'payment_method'])
+            logger.info(f"Pagamento quota annullato per tessera {card.card_number} da {request.user.username}")
+            messages.success(request, _("Pagamento annullato: la quota risulta di nuovo in attesa."))
+            return redirect('core:membership_fee_detail', pk=card.pk)
+
+        form = MembershipFeeForm(request.POST, card=card)
+        if action not in ('save_amount', 'mark_paid') or not form.is_valid():
+            if action not in ('save_amount', 'mark_paid'):
+                messages.error(request, _("Operazione non riconosciuta."))
+            return self.render_to_response(self.get_context_data(form=form))
+
+        amount = form.cleaned_data['fee_amount']
+        if action == 'save_amount':
+            card.fee_amount = amount
+            card.save(update_fields=['fee_amount'])
+            messages.success(request, _("Importo della quota aggiornato."))
+        else:
+            card.pay_fee(amount, form.cleaned_data.get('payment_method') or 'BANK_TRANSFER')
+            messages.success(request, _("Pagamento della quota registrato."))
+
+        logger.info(f"Quota tessera {card.card_number} aggiornata ({action}) da {request.user.username}")
+        return redirect('core:membership_fee_detail', pk=card.pk)
 
 @login_required
 @require_POST

@@ -141,7 +141,9 @@
                         {% for card in cards %}
                         <tr>
                             <td>
-                                <strong>{{ card.card_number }}</strong>
+                                <a href="{% url 'core:membership_fee_detail' card.pk %}" class="text-decoration-none">
+                                    <strong>{{ card.card_number }}</strong>
+                                </a>
                                 {% if card.is_expired %}
                                     <br><small class="text-danger">Scaduta</small>
                                 {% endif %}
@@ -192,6 +194,9 @@
                             </td>
                             <td>
                                 <div class="btn-group" role="group">
+                                    <a href="{% url 'core:membership_fee_detail' card.pk %}" class="btn btn-sm btn-cer-primary" title="Dettaglio quota">
+                                        <i class="fas fa-eye"></i> Dettaglio
+                                    </a>
                                     {% if not card.membership_fee_paid %}
                                     <button class="btn btn-sm btn-cer-success" 
                                             onclick="markAsPaid({{ card.id }}, '{{ card.card_number }}')">
@@ -294,8 +299,8 @@
 <script>
 const API_URLS = {
     setBulkFees: '{% url "core:api_bulk_fees" cer_pk=cer.pk %}',
-    setFee: '/core/api/fees/set/',
-    markPaid: '/core/api/fees/paid/'
+    setFee: '/api/fees/set/',
+    markPaid: '/api/fees/paid/'
 };
 
 async function setBulkFees() {

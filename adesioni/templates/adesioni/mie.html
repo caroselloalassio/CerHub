@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Le mie adesioni - CER Hub{% endblock %}
+{% block content %}
+{% include 'adesioni/_stile.html' %}
+<div class="container ad-wrap mt-4 mb-5">
+  <h1 class="h2 mb-4">Le mie adesioni</h1>
+  {% for a in adesioni %}
+  <div class="ad-card">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+      <div>
+        <h2 class="mb-1">Domanda {{ a.numero }}</h2>
+        <p class="mb-2">{{ a.intestatario }} · POD {{ a.pod }}{% if a.cer %} · {{ a.cer.name }}{% endif %}</p>
+      </div>
+      <span class="badge {% if a.stato == 'APPROVATA' %}bg-success{% elif a.stato == 'RIFIUTATA' %}bg-secondary{% elif a.stato == 'FIRMATA' %}bg-info text-dark{% else %}bg-warning text-dark{% endif %}">{{ a.get_stato_display }}</span>
+    </div>
+    <p class="text-muted small mb-3">Compilata il {{ a.creata_il|date:"d/m/Y" }}{% if a.firmata_il %} · firmata il {{ a.firmata_il|date:"d/m/Y H:i" }}{% endif %}</p>
+    <div class="d-flex flex-wrap gap-2">
+      {% if a.pdf_firmato %}
+        <a class="btn btn-cer-primary btn-sm" href="{% url 'adesioni:documento' a.token 'firmata' %}?scarica"><i class="fas fa-download me-2" aria-hidden="true"></i>Domanda firmata (PDF)</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'adesioni:documento' a.token 'documento-fronte' %}" target="_blank" rel="noopener">Documento – fronte</a>
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'adesioni:documento' a.token 'documento-retro' %}" target="_blank" rel="noopener">Documento – retro</a>
+      {% else %}
+        <a class="btn btn-cer-primary btn-sm" href="{% url 'adesioni:riepilogo' a.token %}">Controlla e firma</a>
+      {% endif %}
+    </div>
+  </div>
+  {% empty %}
+  <div class="ad-card">
+    <p class="mb-3">Non hai ancora domande di adesione.</p>
+    <a class="btn btn-cer-primary" href="{% url 'adesioni:scelta' %}">Aderisci a CER Hub</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

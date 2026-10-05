@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Aderisci a CER Hub{% endblock %}
+{% block meta_description %}Domanda di adesione online alla Comunità Energetica Rinnovabile CER Hub, con firma elettronica.{% endblock %}
+{% block content %}
+{% include 'adesioni/_stile.html' %}
+<div class="container ad-wrap mt-4 mb-5">
+  <h1 class="h2 mb-2">Aderisci alla Comunità Energetica Rinnovabile</h1>
+  <p class="lead mb-4">Compili la domanda online, la firmi dal telefono o dal computer e ricevi subito la tua copia. Servono circa dieci minuti.</p>
+
+  {% if not firma_attiva %}
+  <div class="alert alert-warning alert-permanent" role="alert">
+    L'adesione online è in fase di attivazione. Per aderire adesso scrivici a
+    <a href="mailto:{{ email_associazione }}">{{ email_associazione }}</a>.
+  </div>
+  {% else %}
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <a class="ad-card ad-scelta" href="{% url 'adesioni:privati' %}">
+        <i class="fas fa-user mb-3" aria-hidden="true"></i>
+        <h2>Privati e ditte individuali</h2>
+        <p class="mb-0">Persone fisiche, imprenditori individuali, imprese agricole individuali.</p>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a class="ad-card ad-scelta" href="{% url 'adesioni:aziende' %}">
+        <i class="fas fa-building mb-3" aria-hidden="true"></i>
+        <h2>Aziende</h2>
+        <p class="mb-0">Società (PMI) e associazioni, con il legale rappresentante o un procuratore.</p>
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="ad-card">
+    <h2>Tieni a portata di mano</h2>
+    <ul class="mb-0">
+      <li>una <strong>bolletta dell'energia elettrica</strong>: servono codice POD, potenza impegnata e tensione di fornitura;</li>
+      <li>il <strong>documento d'identità</strong> di chi firma, da fotografare fronte e retro;</li>
+      <li>l'<strong>IBAN</strong> del conto intestato al titolare del POD;</li>
+      <li>i <strong>dati catastali</strong> dell'immobile (foglio, particella, subalterno): li trovi nell'atto di acquisto o nel contratto di affitto;</li>
+      <li>per le aziende: partita IVA, codice ATECO e PEC.</li>
+    </ul>
+  </div>
+  <p class="text-muted small">Prima di firmare leggi lo <a href="https://www.cerhub.it/chi-siamo/">Statuto e il Regolamento</a> dell'associazione.
+  I dati sono trattati da CER Hub secondo l'<a href="{% url 'users:privacy_policy' %}">informativa sulla privacy</a>.</p>
+</div>
+{% endblock %}

@@ -16,8 +16,10 @@ logger = logging.getLogger(__name__)
 from .base import BasePlantView
 from ..models import Plant, CERConfiguration
 from energy.models import DeviceConfiguration, DeviceMeasurement
-from ..forms import PlantForm, PlantMQTTConfigForm
+from ..forms import PlantForm
 from .mixins.gdpr import GDPRDataProtectionMixin
+# La configurazione MQTT dell'impianto e' in core/views/mqtt.py (riesportata qui per compatibilita')
+from .mqtt import PlantMQTTConfigView
 
 @login_required
 def plant_delete(request, pk):
@@ -255,32 +257,3 @@ class PlantUpdateView(UpdateView, BasePlantView):
     def get_success_url(self):
         """URL di redirect dopo il salvataggio"""
         return reverse_lazy('core:plant_detail', kwargs={'pk': self.object.pk})
-
-class PlantMQTTConfigView(BasePlantView):
-    """Configurazione MQTT di un impianto"""
-    template_name = 'core/mqtt_config.html'
-    form_class = PlantMQTTConfigForm
-    
-    def get_object(self):
-        return get_object_or_404(
-            Plant, 
-            pk=self.kwargs['pk'],
-            owner=self.request.user
-        )
-        
-    def form_valid(self, form):
-        try:
-            plant = form.save(commit=False)
-            
-            # Test connessione MQTT
-            if plant.test_mqtt_connection():
-                plant.save()
-                messages.success(self.request, _("Configurazione MQTT aggiornata con successo"))
-                return redirect('core:plant_detail', pk=plant.pk)
-            else:
-                messages.error(self.request, _("Test connessione MQTT fallito"))
-                return self.form_invalid(form)
-                
-        except Exception as e:
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)

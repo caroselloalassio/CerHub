@@ -10,10 +10,8 @@ ENV PATH="/app/venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1
 
 COPY requirements.txt /app/code/requirements.txt
-# Django resta sulla serie 5.0 del progetto, ma con le correzioni di sicurezza
 RUN python3 -m venv /app/venv && \
     pip install --no-cache-dir --upgrade pip && \
-    sed -i 's/^Django==5\.0$/Django>=5.0.14,<5.1/' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/code
@@ -23,7 +21,7 @@ COPY . /app/code
 RUN rm -rf /app/code/logs /app/code/media && \
     ln -s /app/data/logs /app/code/logs && \
     ln -s /app/data/media /app/code/media && \
-    for app in users core energy documents; do \
+    for app in users core energy documents adesioni; do \
         rm -rf /app/code/$app/migrations && \
         ln -s /app/data/migrations/$app /app/code/$app/migrations; \
     done

@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/energy/', include('energy.urls', namespace='energy-api')),  # API URLs sotto /api/energy/
     path('users/', include('users.urls')),
     path('documents/', include('documents.urls')),
+    path('adesione/', include('adesioni.urls')),
     
     # Monitoring and health checks
     path('monitoring/', include('monitoring.urls')),

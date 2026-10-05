@@ -500,7 +500,7 @@
     <nav class="navbar navbar-expand-lg cer-navbar">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
-                <img src="{% static 'images/cerhub-logo.png' %}" alt="CER Hub" class="cerhub-logo">
+                <img src="{% static 'images/cerhub-logo.svg' %}" alt="CER Hub" class="cerhub-logo">
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -559,6 +559,9 @@
                                 <li><a class="dropdown-item" href="{% url 'users:profile' %}">
                                     <i class="fas fa-user-circle me-2"></i>Il mio profilo
                                 </a></li>
+                                <li><a class="dropdown-item" href="{% url 'adesioni:mie' %}">
+                                    <i class="fas fa-file-signature me-2"></i>Le mie adesioni
+                                </a></li>
                                 {% if user.is_staff %}
                                 <li><a class="dropdown-item" href="/ceradmin/">
                                     <i class="fas fa-cogs me-2"></i>Pannello Admin
@@ -582,8 +585,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="btn btn-cer-primary" href="{% url 'users:register' %}">
-                                <i class="fas fa-user-plus me-2"></i>Registrati
+                            <a class="btn btn-cer-primary" href="{% url 'adesioni:scelta' %}">
+                                <i class="fas fa-file-signature me-2"></i>Aderisci
                             </a>
                         </li>
                     {% endif %}
@@ -629,7 +632,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-3">
-                        <img src="{% static 'images/cerhub-logo.png' %}" alt="CER Hub" class="cerhub-footer-logo">
+                        <img src="{% static 'images/cerhub-logo-white.svg' %}" alt="CER Hub" class="cerhub-footer-logo">
                     </div>
                     <p class="mb-2">Piattaforma per la gestione delle Comunità Energetiche Rinnovabili</p>
                     <p class="mb-0"><small>&copy; {% now "Y" %} CER Hub &middot; Associazione Comunit&agrave; Energetica<br>Codice Fiscale: 90076120097</small></p>

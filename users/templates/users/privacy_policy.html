@@ -35,6 +35,7 @@
                         <li><strong>Dati dei punti di connessione e degli impianti:</strong> codice POD, indirizzo e posizione, tipologia (consumatore, produttore, entrambi), potenza, tensione, date di installazione e attivazione, codici e dati dell'attestato Gaud&igrave;.</li>
                         <li><strong>Dati di energia:</strong> misure di produzione, consumo e immissione, anche con cadenza ravvicinata se sull'impianto &egrave; installato un misuratore collegato alla piattaforma, e i dati di energia condivisa e degli incentivi comunicati dal GSE.</li>
                         <li><strong>Dati dell'adesione:</strong> comunit&agrave; di appartenenza, ruolo, tessera e numero di iscrizione nel registro soci, quota associativa e relativo pagamento, ripartizione dei benefici economici.</li>
+                        <li><strong>Dati della domanda di adesione online:</strong> dati anagrafici e di residenza o sede, dati del contatore e riferimenti catastali dell'immobile, IBAN per l'accredito dei contributi, fotografia fronte e retro del documento d'identit&agrave; del firmatario, firma elettronica e relativi dati tecnici (data, ora, indirizzo IP, indirizzo email).</li>
                         <li><strong>Documenti caricati:</strong> ad esempio attestato Gaud&igrave;, dichiarazioni di conformit&agrave;, pratiche GSE, fotografie dell'impianto.</li>
                         <li><strong>Dati tecnici di accesso:</strong> data e ora degli accessi riusciti e falliti, indirizzo IP e tipo di browser, registrati per ragioni di sicurezza.</li>
                         <li><strong>Cookie:</strong> vedi la <a href="{% url 'users:cookie_policy' %}">cookie policy</a>.</li>
@@ -93,7 +94,7 @@
                     <ul>
                         <li><strong>GSE &ndash; Gestore dei Servizi Energetici</strong>, gestore della rete di distribuzione e altri soggetti pubblici, quando &egrave; previsto dalla normativa sulle CER.</li>
                         <li><strong>Amministratori e referenti della tua CER</strong>, per la gestione della comunit&agrave;.</li>
-                        <li><strong>Fornitori di servizi tecnici</strong> (hosting, manutenzione della piattaforma, posta elettronica), che operano come responsabili del trattamento in base a un accordo scritto.</li>
+                        <li><strong>Fornitori di servizi tecnici</strong> (hosting, manutenzione della piattaforma, posta elettronica, servizio di firma elettronica gestito dall'associazione su firme.cerhub.it), che operano come responsabili del trattamento in base a un accordo scritto.</li>
                         <li><strong>Consulenti</strong> dell'associazione (fiscali, legali), nei limiti del loro incarico, e autorit&agrave; quando richiesto dalla legge.</li>
                         <li><strong>Google Ireland Limited</strong>, solo se acconsenti ai cookie statistici.</li>
                     </ul>
@@ -110,6 +111,8 @@
                         <li>Dati dell'account e dell'adesione: per tutta la durata del rapporto associativo.</li>
                         <li>Dati e documenti con rilevanza amministrativa, contabile o relativi agli incentivi: per 10 anni dalla fine del rapporto o dall'ultima erogazione, salvo termini pi&ugrave; lunghi previsti dalla legge o necessari in caso di contenzioso.</li>
                         <li>Misure di energia: per la durata del periodo di incentivazione e per i successivi 10 anni.</li>
+                        <li>Domande di adesione compilate e non firmate: 30 giorni, poi vengono eliminate insieme alle fotografie del documento.</li>
+                        <li>Domande di adesione firmate e copia del documento d'identit&agrave;: per la durata del rapporto associativo e per i successivi 10 anni; se la domanda non &egrave; accolta, 12 mesi dalla comunicazione dell'esito.</li>
                         <li>Registri degli accessi: 12 mesi.</li>
                         <li>Dati statistici di Google Analytics: al massimo 14 mesi.</li>
                     </ul>

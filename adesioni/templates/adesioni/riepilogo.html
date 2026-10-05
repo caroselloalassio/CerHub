@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}La tua domanda di adesione - CER Hub{% endblock %}
+{% block content %}
+{% include 'adesioni/_stile.html' %}
+<div class="container ad-wrap mt-4 mb-5">
+{% if adesione.da_firmare %}
+  {% include 'adesioni/_passi.html' with passo=2 %}
+  <h1 class="h2 mb-2">Controlla e firma</h1>
+  <p class="mb-4">Rileggi la domanda completa, con gli allegati. Se è tutto corretto firmala: bastano pochi secondi, scrivendo o disegnando il tuo nome.</p>
+
+  <div class="ad-card">
+    <h2>Domanda {{ adesione.numero }}</h2>
+    <dl class="row ad-dati mb-0">
+      <div class="col-md-6"><dt>Aderente</dt><dd>{{ adesione.intestatario }}</dd></div>
+      <div class="col-md-6"><dt>Firmatario</dt><dd>{{ adesione.nome_completo }} · {{ adesione.codice_fiscale }}</dd></div>
+      <div class="col-md-6"><dt>E-mail</dt><dd>{{ adesione.email }}</dd></div>
+      <div class="col-md-6"><dt>Cellulare</dt><dd>{{ adesione.cellulare }}</dd></div>
+      <div class="col-md-6"><dt>Codice POD</dt><dd>{{ adesione.pod }}</dd></div>
+      <div class="col-md-6"><dt>Potenza impegnata</dt><dd>{{ adesione.potenza_impegnata }} kW · {{ adesione.tensione }} · {{ adesione.get_fasi_display }}</dd></div>
+      <div class="col-md-6"><dt>Configurazione</dt><dd>{% if adesione.cer %}{{ adesione.cer.name }}{% else %}Da assegnare a cura di CER Hub{% endif %}</dd></div>
+      <div class="col-md-6"><dt>IBAN</dt><dd>{{ adesione.iban }}</dd></div>
+    </dl>
+    <div class="d-flex flex-wrap gap-2 mt-2">
+      <a class="btn btn-outline-secondary" href="{% url 'adesioni:documento' adesione.token 'domanda' %}" target="_blank" rel="noopener"><i class="fas fa-file-pdf me-2" aria-hidden="true"></i>Leggi la domanda completa (PDF)</a>
+      <a class="btn btn-outline-secondary" href="{% url 'adesioni:modifica' adesione.token %}"><i class="fas fa-pen me-2" aria-hidden="true"></i>Correggi i dati</a>
+    </div>
+  </div>
+
+  {% if firma_attiva %}
+  <form method="post" action="{% url 'adesioni:firma' adesione.token %}" id="ad-firma">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-cer-primary btn-lg"><i class="fas fa-signature me-2" aria-hidden="true"></i>{% if adesione.stato == 'IN_FIRMA' %}Riprendi la firma{% else %}Firma la domanda{% endif %}</button>
+  </form>
+  <p class="form-text mt-2">Verrai portato sul servizio di firma di CER Hub (firme.cerhub.it) e poi di nuovo qui. Ti abbiamo anche inviato per e-mail il link per riprendere in un secondo momento.</p>
+  {% else %}
+  <div class="alert alert-warning alert-permanent" role="alert">La firma online non è al momento disponibile. I tuoi dati sono salvati: riprova più tardi dal link che ti abbiamo inviato per e-mail.</div>
+  {% endif %}
+
+{% else %}
+  {% include 'adesioni/_passi.html' with passo=3 %}
+  {% if adesione.stato == 'FIRMATA' %}
+    <h1 class="h2 mb-2">Domanda firmata</h1>
+    <p class="mb-4">Grazie {{ adesione.nome }}: la domanda {{ adesione.numero }} è stata firmata il {{ adesione.firmata_il|date:"d/m/Y" }} alle {{ adesione.firmata_il|date:"H:i" }}. Sarà esaminata dagli organi dell'associazione e ti scriveremo l'esito.</p>
+  {% elif adesione.stato == 'APPROVATA' %}
+    <h1 class="h2 mb-2">Domanda accolta</h1>
+    <p class="mb-4">La domanda {{ adesione.numero }} è stata accolta{% if adesione.esito_il %} il {{ adesione.esito_il|date:"d/m/Y" }}{% endif %}. L'attivazione dell'incentivo è subordinata all'accettazione dell'istanza da parte del GSE.</p>
+  {% else %}
+    <h1 class="h2 mb-2">Domanda non accolta</h1>
+    <p class="mb-4">La domanda {{ adesione.numero }} non è stata accolta. Per informazioni scrivi a <a href="mailto:{{ email_associazione }}">{{ email_associazione }}</a>.</p>
+  {% endif %}
+
+  <div class="ad-card">
+    <h2>I tuoi documenti</h2>
+    <div class="d-flex flex-wrap gap-2">
+      {% if adesione.pdf_firmato %}
+      <a class="btn btn-cer-primary" href="{% url 'adesioni:documento' adesione.token 'firmata' %}?scarica"><i class="fas fa-download me-2" aria-hidden="true"></i>Scarica la domanda firmata (PDF)</a>
+      <a class="btn btn-outline-secondary" href="{% url 'adesioni:documento' adesione.token 'firmata' %}" target="_blank" rel="noopener">Apri</a>
+      {% endif %}
+    </div>
+    <p class="form-text mt-3 mb-0">Il PDF contiene la domanda con gli allegati, la copia del documento d'identità e il certificato della firma elettronica. Ne abbiamo inviata una copia a {{ adesione.email }}.</p>
+  </div>
+
+  <div class="ad-card">
+    <h2>La tua area soci</h2>
+    {% if user.is_authenticated %}
+      <p class="mb-2">Ritrovi sempre questi documenti in <a href="{% url 'adesioni:mie' %}">Le mie adesioni</a>.</p>
+    {% else %}
+      <p class="mb-2">Abbiamo creato il tuo accesso all'area soci di CER Hub, dove ritrovi sempre i documenti firmati. Nell'e-mail che ti abbiamo inviato c'è il link per scegliere la password.</p>
+      <a class="btn btn-outline-secondary" href="{% url 'users:login' %}">Vai all'accesso</a>
+    {% endif %}
+  </div>
+{% endif %}
+</div>
+{% endblock %}

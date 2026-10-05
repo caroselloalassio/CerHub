@@ -154,6 +154,7 @@ LOGGING = {
         'energy.measurements': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
         'energy.devices': {'handlers': ['console'], 'level': 'WARNING', 'propagate': False},
         'documents': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+        'adesioni': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
         'geocoding': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
         'gaudi': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
     },

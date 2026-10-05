@@ -19,13 +19,19 @@ from django.conf import settings
 
 from django.views.generic.edit import DeleteView
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def user_can_access_plant(user, plant):
+    """Lo staff accede a tutti gli impianti, gli altri utenti solo ai propri"""
+    return user.is_staff or user.is_superuser or plant.owner_id == user.pk
+
 
 class DocumentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Document
@@ -62,7 +68,7 @@ class DocumentListView(LoginRequiredMixin, ListView):
         # Inizializza il dizionario document_groups
         context['document_groups'] = {
             'identity': documents.filter(type='ID_DOC'),
-            'technical': documents.filter(type__in=['SYSTEM_CERT', 'PANELS_PHOTO', 'INVERTER_PHOTO']),
+            'technical': documents.filter(type__in=['SYSTEM_CERT', 'PANELS_PHOTO', 'INVERTER_PHOTO', 'PANELS_LIST']),
             'administrative': documents.filter(type__in=['BILL', 'GSE_DOC']),
             'other': documents.filter(type='OTHER'),
             'gaudi': documents.filter(type='GAUDI')  # Aggiunto qui il gruppo gaudi
@@ -80,21 +86,40 @@ class DocumentListView(LoginRequiredMixin, ListView):
             )
         
         # Plant context se arriva dalla vista di un impianto
-        plant_id = self.request.GET.get('plant')
-        if plant_id:
-            context['plant'] = get_object_or_404(Plant, pk=plant_id)
+        plant = self.get_plant()
+        if plant:
+            context['plant'] = plant
+            # Documenti d'archivio caricati dall'area di amministrazione
+            context['legacy_documents'] = plant.documents.all()
             
         return context
 
+    def get_plant(self):
+        """
+        Impianto indicato con ?plant=<id>, se presente.
+        Risponde 404 se l'impianto non esiste o l'utente non puo' accedervi.
+        """
+        if not hasattr(self, '_plant'):
+            self._plant = None
+            plant_id = self.request.GET.get('plant')
+            if plant_id:
+                if not plant_id.isdigit():
+                    raise Http404
+                plant = get_object_or_404(Plant, pk=plant_id)
+                if not user_can_access_plant(self.request.user, plant):
+                    raise Http404
+                self._plant = plant
+        return self._plant
+
     def get_queryset(self):
-        base_queryset = Document.objects.filter(
-            uploaded_by=self.request.user
-        ).select_related('plant')
-        
-        # Filtra per impianto se specificato
-        plant_id = self.request.GET.get('plant')
-        if plant_id:
-            base_queryset = base_queryset.filter(plant_id=plant_id)
+        plant = self.get_plant()
+        if plant:
+            # Tutti i documenti dell'impianto (accesso gia' verificato in get_plant)
+            base_queryset = Document.objects.filter(plant=plant).select_related('plant')
+        else:
+            base_queryset = Document.objects.filter(
+                uploaded_by=self.request.user
+            ).select_related('plant')
         
         # Filtra documenti confidenziali se l'utente non ha i permessi
         if not self.request.user.has_perm('documents.view_confidential'):
@@ -108,8 +133,12 @@ class DocumentUploadView(LoginRequiredMixin, CreateView):
     template_name = 'documents/upload.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # Ottieni l'impianto dal parametro URL
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+        # Ottieni l'impianto dal parametro URL (solo se l'utente puo' gestirlo)
         self.plant = get_object_or_404(Plant, pk=self.kwargs.get('plant_id'))
+        if not user_can_access_plant(request.user, self.plant):
+            raise Http404
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -143,8 +172,10 @@ class DocumentDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         document = self.get_object()
         user = self.request.user
         
-        # Verifica permessi base
-        if document.uploaded_by != user and not user.is_staff:
+        # Verifica permessi base: chi ha caricato il documento, lo staff
+        # oppure il proprietario dell'impianto a cui il documento e' associato
+        is_plant_owner = bool(document.plant_id and document.plant.owner_id == user.pk)
+        if document.uploaded_by != user and not user.is_staff and not is_plant_owner:
             return False
             
         # Verifica permessi speciali

@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Quota associativa {{ card.card_number }} - CER Hub{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:cer_detail' cer.pk %}">{{ cer.name }}</a></li>
+            {% if can_manage %}
+            <li class="breadcrumb-item"><a href="{% url 'core:cer_fees' cer_pk=cer.pk %}">Gestione Quote</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active">Tessera {{ card.card_number }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="mb-0">Quota associativa</h2>
+            <p class="text-muted mb-0">{{ cer.name }} &middot; tessera {{ card.card_number }}</p>
+        </div>
+        <div>
+            {% if can_manage %}
+            <a href="{% url 'core:cer_fees' cer_pk=cer.pk %}" class="btn btn-cer-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Torna alle quote
+            </a>
+            {% else %}
+            <a href="{% url 'core:membership_card' cer_pk=cer.pk %}" class="btn btn-cer-secondary">
+                <i class="fas fa-id-card me-1"></i>La mia tessera
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Riepilogo -->
+        <div class="col-lg-7 mb-4">
+            <div class="card cer-card h-100">
+                <div class="cer-card-header">
+                    <h5 class="mb-0">Riepilogo</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Socio</dt>
+                        <dd class="col-sm-7">
+                            {% if member.is_private %}
+                                {{ member.first_name }} {{ member.last_name }}
+                            {% else %}
+                                {{ member.legal_name }}
+                            {% endif %}
+                            <small class="text-muted d-block">{{ member.username }}{% if member.email %} &middot; {{ member.email }}{% endif %}</small>
+                        </dd>
+
+                        <dt class="col-sm-5">Tipo di adesione</dt>
+                        <dd class="col-sm-7">{{ membership.get_member_type_display }}</dd>
+
+                        <dt class="col-sm-5">Tessera</dt>
+                        <dd class="col-sm-7">
+                            {{ card.card_number }}
+                            {% if card.is_expired %}
+                                <span class="badge-cer badge-cer-danger ms-1">Scaduta</span>
+                            {% elif not card.is_active %}
+                                <span class="badge-cer badge-cer-warning ms-1">Non attiva</span>
+                            {% endif %}
+                            <small class="text-muted d-block">
+                                Emessa il {{ card.issue_date|date:"d/m/Y" }}, scade il {{ card.expiry_date|date:"d/m/Y" }}
+                            </small>
+                        </dd>
+
+                        <dt class="col-sm-5">Importo quota</dt>
+                        <dd class="col-sm-7"><strong>&euro; {{ card.fee_amount|floatformat:2 }}</strong></dd>
+
+                        <dt class="col-sm-5">Stato pagamento</dt>
+                        <dd class="col-sm-7">
+                            {% if card.membership_fee_paid %}
+                                <span class="badge-cer badge-cer-success"><i class="fas fa-check me-1"></i>Pagata</span>
+                            {% else %}
+                                <span class="badge-cer badge-cer-warning"><i class="fas fa-clock me-1"></i>In attesa</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-5">Data pagamento</dt>
+                        <dd class="col-sm-7">
+                            {% if card.fee_payment_date %}{{ card.fee_payment_date|date:"d/m/Y H:i" }}{% else %}<span class="text-muted">-</span>{% endif %}
+                        </dd>
+
+                        <dt class="col-sm-5">Metodo di pagamento</dt>
+                        <dd class="col-sm-7 mb-0">
+                            {% if card.payment_method %}{{ card.get_payment_method_display }}{% else %}<span class="text-muted">-</span>{% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestione (solo staff) -->
+        <div class="col-lg-5 mb-4">
+            {% if can_manage %}
+            <div class="card cer-card">
+                <div class="cer-card-header">
+                    <h5 class="mb-0">Gestione quota</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-permanent">{{ form.non_field_errors }}</div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.fee_amount.id_for_label }}" class="form-label">Importo quota (&euro;)</label>
+                            {{ form.fee_amount }}
+                            {% for error in form.fee_amount.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.payment_method.id_for_label }}" class="form-label">Metodo di pagamento</label>
+                            {{ form.payment_method }}
+                            {% for error in form.payment_method.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">Usato solo quando si registra il pagamento.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="save_amount" class="btn btn-cer-primary">
+                                <i class="fas fa-save me-1"></i>Salva importo
+                            </button>
+                            {% if not card.membership_fee_paid %}
+                            <button type="submit" name="action" value="mark_paid" class="btn btn-cer-success">
+                                <i class="fas fa-check me-1"></i>Registra pagamento
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    {% if card.membership_fee_paid %}
+                    <hr>
+                    <form method="post" onsubmit="return confirm('Annullare il pagamento registrato? La quota tornerà in attesa.');">
+                        {% csrf_token %}
+                        <div class="d-grid">
+                            <button type="submit" name="action" value="mark_unpaid" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-undo me-1"></i>Annulla pagamento
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-info alert-permanent mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                {% if card.membership_fee_paid %}
+                    La tua quota associativa risulta pagata. Grazie!
+                {% elif card.fee_amount > 0 %}
+                    La tua quota associativa risulta ancora da versare. Il pagamento viene registrato
+                    dall'amministrazione della comunità energetica: per informazioni contatta i referenti della CER.
+                {% else %}
+                    Al momento non è prevista alcuna quota associativa a tuo carico.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

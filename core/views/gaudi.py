@@ -21,6 +21,7 @@ from datetime import date, datetime
 from django.conf import settings
 
 from django.utils import timezone
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -252,50 +253,339 @@ class NewPlantFromGaudiView(GaudiAddressMixin, BasePlantView, FormView):
                 return self.form_invalid(form) 
     
 class PlantGaudiUpdateView(GaudiAddressMixin, BasePlantView):
-    """Aggiornamento dati impianto da attestato Gaudì"""
+    """
+    Aggiornamento dei dati di un impianto esistente da attestato Gaudì.
+
+    Passo 1: caricamento dell'attestato (PDF) ed estrazione dei dati.
+    Passo 2: anteprima delle differenze e conferma dei campi da aggiornare.
+
+    Accessibile al proprietario dell'impianto e allo staff (404 per gli altri).
+    """
     template_name = 'core/plant_gaudi_update.html'
     form_class = PlantGaudiUpdateForm
-    
-    def get_object(self):
-        return get_object_or_404(
-            Plant,
-            pk=self.kwargs['pk'],
-            owner=self.request.user
-        )
-    
-    def form_valid(self, form):     # Gestisce l'aggiornamento di un impianto esistente con dati Gaudì
-        try:
-            # Crea documento temporaneo
-            temp_doc = Document.objects.create(
-                type='GAUDI',
-                file=form.cleaned_data['gaudi_file'],
-                uploaded_by=self.request.user,
-                source='USER'
+    SESSION_KEY = 'plant_gaudi_update'
+
+    # Campi dell'impianto aggiornabili dall'attestato: (campo, etichetta)
+    UPDATABLE_FIELDS = [
+        ('gaudi_request_code', 'Codice richiesta Gaudì'),
+        ('censimp_code', 'Codice CENSIMP'),
+        ('sapr_code', 'Codice SAPR'),
+        ('gaudi_version', 'Versione attestato'),
+        ('validation_date', 'Data di convalida'),
+        ('expected_operation_date', 'Data di presunto esercizio'),
+        ('nominal_power', 'Potenza nominale (kW)'),
+        ('active_power', 'Potenza attiva nominale (kW)'),
+        ('net_power', 'Potenza efficiente netta (kW)'),
+        ('gross_power', 'Potenza efficiente lorda (kW)'),
+        ('connection_voltage', 'Tensione di connessione (V)'),
+        ('gaudi_voltage', 'Tensione di generazione Gaudì (V)'),
+        ('expected_yearly_production', 'Produzione annua attesa (kWh)'),
+        ('grid_feed_type', 'Tipo di immissione in rete'),
+        ('remote_disconnect', 'Predisposizione teledistacco'),
+        ('generator_group_id', 'Numero gruppo'),
+        ('section_id', 'ID sezione CENSIMP'),
+        ('group_id', 'ID gruppo CENSIMP'),
+        ('address', 'Indirizzo'),
+        ('city', 'Città'),
+        ('province', 'Provincia'),
+        ('zip_code', 'CAP'),
+    ]
+    DATE_FIELDS = ('validation_date', 'expected_operation_date')
+    FLOAT_FIELDS = ('nominal_power', 'active_power', 'net_power', 'gross_power')
+    # L'indirizzo viene ricavato dal testo dell'attestato in modo approssimato:
+    # questi campi sono proposti ma non selezionati in automatico
+    ADDRESS_FIELDS = ('address', 'city', 'province', 'zip_code')
+    # Dati identificativi dell'attestato: vengono sempre aggiornati, perché
+    # confermando l'impianto risulta verificato con questo attestato
+    REQUIRED_FIELDS = ('gaudi_request_code', 'censimp_code', 'validation_date')
+
+    # --- Estrazione e confronto dei dati -------------------------------
+
+    def _values_from_gaudi(self, gaudi_data):
+        """Converte i dati estratti dall'attestato in valori per i campi dell'impianto"""
+        def text(key, max_length=50):
+            value = gaudi_data.get(key)
+            return str(value).strip()[:max_length] if value not in (None, '') else None
+
+        def number(key, cast):
+            value = gaudi_data.get(key)
+            if value in (None, ''):
+                return None
+            try:
+                return cast(str(value).replace(',', '.'))
+            except (TypeError, ValueError):
+                return None
+
+        voltage = number('connection_voltage', lambda v: int(float(v)))
+        section_match = re.search(r'SZ_(\d+)_\d+', gaudi_data.get('section_id') or '')
+        group_match = re.search(r'GR_(\d+)_\d+_\d+', gaudi_data.get('group_id') or '')
+        parsed_address = self._parse_address(gaudi_data.get('address') or '')
+
+        values = {
+            'gaudi_request_code': text('gaudi_request_code'),
+            'censimp_code': text('censimp_code'),
+            'sapr_code': text('sapr_code'),
+            'gaudi_version': number('version_number', lambda v: int(float(v))),
+            'validation_date': gaudi_data.get('validation_date'),
+            'expected_operation_date': gaudi_data.get('expected_operation_date'),
+            'nominal_power': number('nominal_power', float),
+            'active_power': number('active_power', float),
+            'net_power': number('net_power', float),
+            'gross_power': number('gross_power', float),
+            'connection_voltage': str(voltage) if voltage is not None else None,
+            'gaudi_voltage': voltage,
+            'expected_yearly_production': number('expected_yearly_production', lambda v: int(float(v))),
+            'grid_feed_type': 'TOTAL' if gaudi_data.get('grid_feed_type') == 'TOTAL' else 'PARTIAL',
+            'remote_disconnect': bool(gaudi_data.get('remote_disconnect', False)),
+            'generator_group_id': text('generator_group_id'),
+            'section_id': section_match.group(1)[:50] if section_match else None,
+            'group_id': group_match.group(1)[:50] if group_match else None,
+            'address': (parsed_address.get('address') or '')[:255] or None,
+            'city': (parsed_address.get('city') or '')[:100] or None,
+            'province': (parsed_address.get('province') or '')[:2] or None,
+            'zip_code': (parsed_address.get('zip_code') or '')[:5] or None,
+        }
+
+        # Valori serializzabili in sessione; i campi non trovati vengono ignorati
+        clean_values = {}
+        for field, value in values.items():
+            if value is None:
+                continue
+            if isinstance(value, (date, datetime)):
+                value = value.isoformat()[:10]
+            clean_values[field] = value
+        return clean_values
+
+    def _to_python(self, field, value):
+        """Riporta al tipo del modello un valore letto dalla sessione"""
+        if field in self.DATE_FIELDS and isinstance(value, str):
+            return date.fromisoformat(value[:10])
+        return value
+
+    def _display(self, field, value):
+        """Valore leggibile per la tabella di anteprima"""
+        if value is None or value == '':
+            return ''
+        if isinstance(value, bool):
+            return 'Sì' if value else 'No'
+        if isinstance(value, (date, datetime)):
+            return value.strftime('%d/%m/%Y')
+        if field == 'grid_feed_type':
+            return {'TOTAL': 'Totale', 'PARTIAL': 'Parziale'}.get(value, value)
+        if isinstance(value, float):
+            return f"{value:g}".replace('.', ',')
+        return str(value)
+
+    def _is_same(self, field, old, new):
+        if field in self.FLOAT_FIELDS:
+            try:
+                return old is not None and abs(float(old) - float(new)) < 1e-6
+            except (TypeError, ValueError):
+                return False
+        if isinstance(new, str):
+            return str(old or '').strip() == new.strip()
+        return old == new
+
+    def _build_preview(self, plant, values):
+        """Righe della tabella di anteprima: valore attuale e valore dell'attestato"""
+        rows = []
+        for field, label in self.UPDATABLE_FIELDS:
+            if field not in values:
+                continue
+            old = getattr(plant, field, None)
+            new = self._to_python(field, values[field])
+            changed = not self._is_same(field, old, new)
+            rows.append({
+                'field': field,
+                'label': label,
+                'old': self._display(field, old),
+                'new': self._display(field, new),
+                'changed': changed,
+                'checked': changed and field not in self.ADDRESS_FIELDS,
+                'required': field in self.REQUIRED_FIELDS,
+                'is_address': field in self.ADDRESS_FIELDS,
+            })
+        return rows
+
+    # --- Dati in sospeso (sessione + documento temporaneo) --------------
+
+    def _get_pending(self, plant):
+        pending = self.request.session.get(self.SESSION_KEY)
+        if pending and pending.get('plant_id') == plant.pk:
+            return pending
+        return None
+
+    def _discard_pending(self):
+        """Elimina i dati in sospeso e l'eventuale attestato temporaneo"""
+        pending = self.request.session.pop(self.SESSION_KEY, None)
+        if pending and pending.get('doc_id'):
+            temp_docs = Document.objects.filter(
+                pk=pending['doc_id'],
+                type='GAUDI_TEMP',
+                uploaded_by=self.request.user
             )
-            
-            # Processa il documento
-            processor = GaudiProcessor(temp_doc)
-            gaudi_data = processor.extract_data_only()
-            
-            logger.info("Dati estratti da Gaudì:", gaudi_data)
-            
-            # Verifica POD duplicato
-            pod_code = gaudi_data.get('pod_code')
-            if pod_code and Plant.objects.filter(pod_code=pod_code).exists():
-                messages.error(self.request, f"Esiste già un impianto con il POD {pod_code}")
-                return self.form_invalid(form)
-            
-            # Salva i dati in sessione
-            self.request.session['plant_gaudi_data'] = gaudi_data
-            logger.info("Dati salvati in sessione:", self.request.session['plant_gaudi_data'])
-            
-            messages.success(self.request, "Attestato elaborato con successo")
-            return redirect('core:plant_create_with_gaudi')
-                
+            for temp_doc in temp_docs:
+                self._delete_temp_document(temp_doc)
+
+    @staticmethod
+    def _delete_temp_document(temp_doc):
+        """Elimina un attestato temporaneo insieme al file caricato"""
+        try:
+            if temp_doc.file:
+                temp_doc.file.delete(save=False)
         except Exception as e:
-            logger.error("Errore in NewPlantFromGaudiView:", str(e))
-            messages.error(self.request, str(e))
-            return self.form_invalid(form)
+            logger.warning(f"Impossibile eliminare il file dell'attestato temporaneo {temp_doc.pk}: {e}")
+        temp_doc.delete()
+
+    # --- Richieste -------------------------------------------------------
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plant = self.plant
+        context['plant'] = plant
+
+        pending = self._get_pending(plant)
+        if pending and 'form' not in kwargs:
+            rows = self._build_preview(plant, pending['values'])
+            context.update({
+                'step': 'preview',
+                'rows': rows,
+                'changed_count': sum(1 for row in rows if row['changed']),
+                'has_address_rows': any(row['is_address'] and row['changed'] for row in rows),
+                'date_fallback': pending.get('date_fallback', False),
+            })
+        else:
+            context.update({
+                'step': 'upload',
+                'form': kwargs.get('form') or self.form_class(),
+            })
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.plant = self.get_plant_if_allowed(kwargs['pk'])
+        return self.render_to_response(self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        self.plant = self.get_plant_if_allowed(kwargs['pk'])
+        step = request.POST.get('step')
+
+        if step == 'cancel':
+            self._discard_pending()
+            messages.info(request, _("Aggiornamento da attestato Gaudì annullato."))
+            return redirect('core:plant_detail', pk=self.plant.pk)
+        if step == 'confirm':
+            return self._confirm(request)
+        return self._upload(request)
+
+    def _upload(self, request):
+        """Passo 1: riceve l'attestato, estrae i dati e prepara l'anteprima"""
+        plant = self.plant
+        form = self.form_class(request.POST, request.FILES)
+        if not form.is_valid():
+            return self.render_to_response(self.get_context_data(form=form))
+
+        # Un nuovo caricamento sostituisce quello eventualmente in sospeso
+        self._discard_pending()
+
+        temp_doc = Document.objects.create(
+            type='GAUDI_TEMP',
+            file=form.cleaned_data['gaudi_file'],
+            uploaded_by=request.user,
+            source='USER'
+        )
+        try:
+            temp_doc.file.open('rb')
+            try:
+                gaudi_data = GaudiProcessor(temp_doc).extract_data_only()
+            finally:
+                temp_doc.file.close()
+        except Exception as e:
+            logger.error(f"Errore nell'elaborazione dell'attestato Gaudì per l'impianto {plant.pk}: {e}")
+            self._delete_temp_document(temp_doc)
+            form.add_error('gaudi_file', _(
+                "Non è stato possibile leggere i dati dell'attestato. "
+                "Verifica che il file sia l'attestato Gaudì in formato PDF (non una scansione)."
+            ))
+            return self.render_to_response(self.get_context_data(form=form))
+
+        # L'attestato deve riferirsi a questo impianto
+        pod_code = (gaudi_data.get('pod_code') or '').strip().upper()
+        if pod_code != (plant.pod_code or '').strip().upper():
+            self._delete_temp_document(temp_doc)
+            form.add_error('gaudi_file', _(
+                "L'attestato si riferisce al POD %(found)s, mentre questo impianto ha il POD %(expected)s."
+            ) % {'found': pod_code or '-', 'expected': plant.pod_code})
+            return self.render_to_response(self.get_context_data(form=form))
+
+        request.session[self.SESSION_KEY] = {
+            'plant_id': plant.pk,
+            'doc_id': temp_doc.pk,
+            'values': self._values_from_gaudi(gaudi_data),
+            'date_fallback': bool(gaudi_data.get('using_validation_date_as_fallback')),
+        }
+        messages.success(request, _("Attestato elaborato con successo. Verifica i dati prima di confermare."))
+        return redirect('core:plant_gaudi_update', pk=plant.pk)
+
+    def _confirm(self, request):
+        """Passo 2: applica all'impianto i campi selezionati"""
+        plant = self.plant
+        pending = self._get_pending(plant)
+        if not pending:
+            messages.error(request, _("Nessun attestato in attesa di conferma: carica di nuovo il file."))
+            return redirect('core:plant_gaudi_update', pk=plant.pk)
+
+        values = pending['values']
+        requested = set(request.POST.getlist('fields')) | set(self.REQUIRED_FIELDS)
+        selected = [
+            field for field, _label in self.UPDATABLE_FIELDS
+            if field in requested and field in values
+            and not self._is_same(field, getattr(plant, field, None), self._to_python(field, values[field]))
+        ]
+
+        try:
+            with transaction.atomic():
+                for field in selected:
+                    setattr(plant, field, self._to_python(field, values[field]))
+
+                address_changed = any(f in self.ADDRESS_FIELDS for f in selected)
+                if address_changed:
+                    # Aggiorna le coordinate; se la geocodifica fallisce restano quelle precedenti
+                    plant.geocode_address()
+
+                now = timezone.now()
+                plant.gaudi_verified = True
+                plant.gaudi_verification_date = now
+                plant.gaudi_certificate_uploaded = True
+                plant.gaudi_upload_date = now
+                plant.save(do_geocoding=False)
+
+                # L'attestato diventa un documento dell'impianto (già elaborato)
+                temp_doc = Document.objects.filter(
+                    pk=pending.get('doc_id'),
+                    type='GAUDI_TEMP',
+                    uploaded_by=request.user
+                ).first()
+                if temp_doc:
+                    temp_doc.type = 'GAUDI'
+                    temp_doc.plant = plant
+                    temp_doc.processing_status = 'COMPLETED'
+                    temp_doc.processed_at = now
+                    temp_doc.save()
+        except Exception as e:
+            logger.error(f"Errore nell'aggiornamento da Gaudì dell'impianto {plant.pk}: {e}", exc_info=True)
+            messages.error(request, _("Errore durante l'aggiornamento dell'impianto. Nessuna modifica è stata salvata."))
+            return redirect('core:plant_gaudi_update', pk=plant.pk)
+
+        request.session.pop(self.SESSION_KEY, None)
+        logger.info(
+            f"Impianto {plant.pk} aggiornato da attestato Gaudì da {request.user.username} "
+            f"(campi: {', '.join(selected) or 'nessuno'})"
+        )
+        if selected:
+            messages.success(request, _("Impianto aggiornato con i dati dell'attestato Gaudì (%(count)s campi).") % {'count': len(selected)})
+        else:
+            messages.success(request, _("Attestato Gaudì registrato. Nessun dato dell'impianto è stato modificato."))
+        return redirect('core:plant_detail', pk=plant.pk)
 
 class PlantCreateFromGaudiView(GaudiAddressMixin, BasePlantView, FormView):
     """Vista per la creazione di un impianto partendo dai dati Gaudì"""

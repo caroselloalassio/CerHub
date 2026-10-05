@@ -20,13 +20,13 @@
                     </h1>
                     
                     <p class="lead mb-4 text-muted">
-                        La piattaforma open source per la gestione delle 
-                        <strong class="text-energy">Comunità Energetiche Rinnovabili</strong>
+                        L'area soci della nostra
+                        <strong class="text-energy">Comunità Energetica Rinnovabile</strong>
                     </p>
                     
                     <p class="mb-5">
-                        Facilitiamo la collaborazione e la condivisione di energia rinnovabile 
-                        all'interno della tua comunità. Un futuro sostenibile inizia oggi.
+                        Qui i soci di CER Hub seguono la propria adesione, gli impianti e l'energia condivisa.
+                        Non sei ancora socio? Puoi aderire online in pochi minuti.
                     </p>
 
                     {% if user.is_authenticated %}
@@ -43,8 +43,8 @@
                             <a href="{% url 'users:login' %}" class="btn btn-cer-primary btn-lg">
                                 <i class="fas fa-sign-in-alt me-2"></i>Accedi
                             </a>
-                            <a href="{% url 'users:register' %}" class="btn btn-outline-primary btn-lg">
-                                <i class="fas fa-user-plus me-2"></i>Registrati Gratis
+                            <a href="{% url 'adesioni:scelta' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-file-signature me-2"></i>Aderisci a CER Hub
                             </a>
                         </div>
                     {% endif %}
@@ -150,16 +150,16 @@
                 </div>
             </div>
             
-            <!-- Open Source -->
+            <!-- Adesione online -->
             <div class="col-md-4">
                 <div class="cer-card h-100 text-center p-4">
                     <div class="bg-gradient-solar rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
-                        <i class="fab fa-github text-white" style="font-size: 2rem;"></i>
+                        <i class="fas fa-file-signature text-white" style="font-size: 2rem;"></i>
                     </div>
-                    <h4 class="mb-3">Open Source</h4>
+                    <h4 class="mb-3">Adesione online</h4>
                     <p class="text-muted">
-                        Codice aperto, trasparente e personalizzabile. 
-                        Contribuisci al futuro dell'energia sostenibile.
+                        Domanda di adesione con firma elettronica: i documenti
+                        firmati restano sempre disponibili nell'area soci.
                     </p>
                 </div>
             </div>
@@ -170,18 +170,18 @@
     <section class="py-5">
         <div class="cer-card text-center p-5">
             <div class="cer-card-header mb-4">
-                <h3 class="mb-0 fw-bold">Pronto a Iniziare?</h3>
+                <h3 class="mb-0 fw-bold">Vuoi entrare in CER Hub?</h3>
             </div>
             <p class="lead mb-4">
-                Unisciti alla rivoluzione energetica e crea la tua Comunità Energetica Rinnovabile oggi stesso.
+                Compila la domanda di adesione online e firmala dal telefono o dal computer: servono circa dieci minuti.
             </p>
             {% if not user.is_authenticated %}
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
-                    <a href="{% url 'users:register' %}" class="btn btn-cer-primary btn-lg">
-                        <i class="fas fa-rocket me-2"></i>Inizia Gratis
+                    <a href="{% url 'adesioni:scelta' %}" class="btn btn-cer-primary btn-lg">
+                        <i class="fas fa-file-signature me-2"></i>Aderisci online
                     </a>
-                    <a href="#" class="btn btn-outline-primary btn-lg">
-                        <i class="fas fa-book me-2"></i>Scopri di Più
+                    <a href="https://www.cerhub.it" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-book me-2"></i>Scopri di più
                     </a>
                 </div>
             {% else %}

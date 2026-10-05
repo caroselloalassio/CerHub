@@ -55,6 +55,8 @@
                         <i class="fas fa-tools me-2"></i>Documentazione Tecnica
                     {% elif group_name == 'administrative' %}
                         <i class="fas fa-file-contract me-2"></i>Documenti Amministrativi
+                    {% elif group_name == 'gaudi' %}
+                        <i class="fas fa-certificate me-2"></i>Attestati Gaudì
                     {% else %}
                         <i class="fas fa-folder me-2"></i>Altri Documenti
                     {% endif %}
@@ -126,6 +128,56 @@
             </div>
         </div>
         {% endfor %}
+
+        <!-- Documenti d'archivio dell'impianto (caricati dall'area di amministrazione) -->
+        {% if plant and legacy_documents %}
+        <div class="cer-card mb-4">
+            <div class="cer-card-header">
+                <h5 class="mb-0"><i class="fas fa-archive me-2"></i>Documenti d'archivio</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Tipo</th>
+                                <th>Caricato il</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in legacy_documents %}
+                            <tr>
+                                <td><i class="fas fa-file me-2"></i>{{ doc.name }}</td>
+                                <td>{{ doc.get_document_type_display }}</td>
+                                <td>{{ doc.uploaded_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <form method="post" class="d-inline"
+                                          action="{% url 'core:plant_document_delete' pk=plant.pk document_id=doc.pk %}"
+                                          onsubmit="return confirm('Eliminare definitivamente questo documento?');">
+                                        {% csrf_token %}
+                                        <div class="btn-group">
+                                            {% if doc.document %}
+                                            <a href="{{ doc.document.url }}" class="btn btn-sm btn-cer-success"
+                                               target="_blank" title="Scarica documento">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                            {% endif %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Elimina documento">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
@@ -140,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Gestione conferma per documenti confidenziali
-    document.querySelectorAll('.btn-outline-success[data-confidential="true"]').forEach(btn => {
+    document.querySelectorAll('a[data-confidential="true"]').forEach(btn => {
         btn.addEventListener('click', function(e) {
             if (!confirm('Stai per scaricare un documento confidenziale. Confermi di avere l\'autorizzazione necessaria?')) {
                 e.preventDefault();

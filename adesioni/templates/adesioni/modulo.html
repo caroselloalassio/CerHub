@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}Domanda di adesione{% if tipo == 'AZIENDA' %} per aziende{% else %} per privati e ditte individuali{% endif %} - CER Hub{% endblock %}
+{% block content %}
+{% include 'adesioni/_stile.html' %}
+<div class="container ad-wrap mt-4 mb-5">
+  {% include 'adesioni/_passi.html' with passo=1 %}
+  <h1 class="h2 mb-1">Domanda di adesione</h1>
+  <p class="text-muted mb-4">{% if tipo == 'AZIENDA' %}Aziende e associazioni{% else %}Privati e ditte individuali{% endif %}
+    {% if not modifica %}· <a href="{% if tipo == 'AZIENDA' %}{% url 'adesioni:privati' %}{% else %}{% url 'adesioni:aziende' %}{% endif %}">{% if tipo == 'AZIENDA' %}sei un privato o una ditta individuale?{% else %}aderisci come azienda?{% endif %}</a>{% endif %}
+    <br>I campi con <span style="color:#c0392b">*</span> sono obbligatori.</p>
+
+  {% if form.errors %}
+  <div class="alert alert-danger alert-permanent" role="alert" id="ad-riepilogo-errori" tabindex="-1">
+    <strong>Controlla i campi evidenziati:</strong> ci sono {{ form.errors|length }} dati da correggere.
+    {% if form.is_multipart %}Dovrai anche selezionare di nuovo le foto del documento.{% endif %}
+    {% for e in form.non_field_errors %}<div>{{ e }}</div>{% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" novalidate id="ad-form">
+    {% csrf_token %}
+    <div class="ad-hp" aria-hidden="true"><label for="{{ form.sito_web.id_for_label }}">Lascia vuoto</label>{{ form.sito_web }}</div>
+
+    <section class="ad-card">
+      <h2>{% if tipo == 'AZIENDA' %}Chi firma{% else %}I tuoi dati{% endif %}</h2>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.nome col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.cognome col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.codice_fiscale col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.nascita_data col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.nascita_comune col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.nascita_provincia col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.nascita_stato col='col-md-4' %}
+        {% include 'adesioni/_campo.html' with f=form.cellulare col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.email col='col-md-6' %}
+      </div>
+      <p class="form-text mb-0">All'indirizzo e-mail riceverai la domanda firmata e l'accesso all'area soci.</p>
+    </section>
+
+    {% if tipo == 'AZIENDA' %}
+    <section class="ad-card">
+      <h2>Società o associazione</h2>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.qualita col='col-12' inline=True %}
+        {% include 'adesioni/_campo.html' with f=form.denominazione col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.partita_iva col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.cf_ente col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_comune col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_via col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_civico col='col-md-2' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_cap col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_provincia col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_stato col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.ateco col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.pec col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.tipologia col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.studio_associato col='col-md-6' inline=True %}
+        {% include 'adesioni/_campo.html' with f=form.account_gse col='col-md-6' inline=True %}
+      </div>
+    </section>
+    {% else %}
+    <section class="ad-card">
+      <h2>Residenza</h2>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.res_via col='col-md-9' %}
+        {% include 'adesioni/_campo.html' with f=form.res_civico col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.res_cap col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.res_comune col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.res_provincia col='col-md-2' %}
+        {% include 'adesioni/_campo.html' with f=form.res_stato col='col-md-2' %}
+      </div>
+    </section>
+    <section class="ad-card">
+      <h2>Tipologia di soggetto</h2>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.tipologia col='col-12' %}
+      </div>
+      <div class="row" id="ad-ditta">
+        <p class="fw-semibold mb-2">Sede legale della ditta</p>
+        {% include 'adesioni/_campo.html' with f=form.sede_via col='col-md-9' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_civico col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_cap col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_comune col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_provincia col='col-md-2' %}
+        {% include 'adesioni/_campo.html' with f=form.sede_stato col='col-md-2' %}
+        {% include 'adesioni/_campo.html' with f=form.partita_iva col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.ateco col='col-md-6' %}
+      </div>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.account_gse col='col-12' inline=True %}
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="ad-card">
+      <h2>Il contatore (POD)</h2>
+      <p class="form-text">Sono i riferimenti tecnici del contatore di scambio con la rete: li trovi tutti sulla bolletta dell'energia elettrica.</p>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.pod col='col-md-7' %}
+        {% include 'adesioni/_campo.html' with f=form.potenza_impegnata col='col-md-5' %}
+        {% include 'adesioni/_campo.html' with f=form.tensione col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.fasi col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.generazione col='col-12' %}
+      </div>
+      <p class="form-text mb-0">Il contatore di seconda generazione ha un QR code sulla scocca; sono stati installati dal 2017 in poi.</p>
+    </section>
+
+    <section class="ad-card">
+      <h2>Riferimenti catastali dell'immobile</h2>
+      <p class="form-text">L'immobile che utilizza l'energia elettrica del POD. I riferimenti sono nel contratto di locazione o nell'atto di acquisto.</p>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.cat_sezione col='col-6 col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_foglio col='col-6 col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_particella col='col-6 col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_subalterno col='col-6 col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_indirizzo col='col-md-9' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_civico col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_cap col='col-md-3' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_comune col='col-md-6' %}
+        {% include 'adesioni/_campo.html' with f=form.cat_provincia col='col-md-3' %}
+      </div>
+      {% if tipo != 'AZIENDA' %}<button type="button" class="btn btn-outline-secondary btn-sm" id="ad-copia-indirizzo">Usa l'indirizzo di residenza</button>{% endif %}
+    </section>
+
+    <section class="ad-card">
+      <h2>Configurazione e accredito</h2>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.cer col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.iban col='col-12' %}
+      </div>
+    </section>
+
+    <section class="ad-card">
+      <h2>Documento d'identità di chi firma</h2>
+      <p class="form-text">Fotografa il documento in corso di validità su una superficie piana, con buona luce, tutto dentro l'inquadratura.
+        {% if modifica %}<br>Le foto già caricate restano valide: selezionane di nuove solo se vuoi sostituirle.{% endif %}</p>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row">{% include 'adesioni/_campo.html' with f=form.doc_fronte col='col-12' %}</div>
+          <img class="ad-anteprima" alt="Anteprima del fronte del documento" data-per="{{ form.doc_fronte.id_for_label }}">
+        </div>
+        <div class="col-md-6">
+          <div class="row">{% include 'adesioni/_campo.html' with f=form.doc_retro col='col-12' %}</div>
+          <img class="ad-anteprima" alt="Anteprima del retro del documento" data-per="{{ form.doc_retro.id_for_label }}">
+        </div>
+      </div>
+    </section>
+
+    <section class="ad-card">
+      <h2>Dichiarazioni</h2>
+      <p class="form-text">Lo <a href="https://www.cerhub.it/chi-siamo/" target="_blank" rel="noopener">Statuto e il Regolamento</a> sono pubblicati sul sito dell'associazione.</p>
+      <div class="row">
+        {% include 'adesioni/_campo.html' with f=form.dich_esclusioni col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.dich_no_incentivi col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.dich_no_ssp col='col-12' %}
+        {% if form.dich_pmi %}<div id="ad-pmi" class="col-12"><div class="row">{% include 'adesioni/_campo.html' with f=form.dich_pmi col='col-12' %}</div></div>{% endif %}
+        {% include 'adesioni/_campo.html' with f=form.dich_statuto col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.dich_dati col='col-12' %}
+        {% include 'adesioni/_campo.html' with f=form.dich_variazioni col='col-12' %}
+      </div>
+    </section>
+
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <button type="submit" class="btn btn-cer-primary btn-lg" id="ad-invia">{% if modifica %}Salva e torna al riepilogo{% else %}Prosegui: controlla e firma{% endif %}</button>
+      {% if modifica %}<a class="btn btn-outline-secondary btn-lg" href="{% url 'adesioni:riepilogo' adesione.token %}">Annulla</a>{% endif %}
+    </div>
+    <p class="form-text mt-2">Nel passo successivo potrai rileggere la domanda completa prima di firmarla.</p>
+  </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function () {
+  var form = document.getElementById('ad-form');
+  function valore(nome) { var r = form.querySelector('input[name="' + nome + '"]:checked'); return r ? r.value : ''; }
+  function mostra(el, si) { if (el) { el.style.display = si ? '' : 'none'; } }
+
+  var ditta = document.getElementById('ad-ditta'), pmi = document.getElementById('ad-pmi');
+  function aggiorna() {
+    var t = valore('tipologia');
+    if (ditta) { mostra(ditta, t === 'DITTA'); }
+    if (pmi) { mostra(pmi, t === 'PMI'); }
+  }
+  form.addEventListener('change', function (e) { if (e.target.name === 'tipologia') { aggiorna(); } });
+  aggiorna();
+
+  var copia = document.getElementById('ad-copia-indirizzo');
+  if (copia) {
+    copia.addEventListener('click', function () {
+      [['res_via', 'cat_indirizzo'], ['res_civico', 'cat_civico'], ['res_cap', 'cat_cap'], ['res_comune', 'cat_comune'], ['res_provincia', 'cat_provincia']]
+        .forEach(function (c) { form.elements[c[1]].value = form.elements[c[0]].value; });
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.ad-anteprima'), function (img) {
+    var input = document.getElementById(img.getAttribute('data-per'));
+    if (!input) { return; }
+    input.addEventListener('change', function () {
+      if (input.files && input.files[0]) {
+        img.src = URL.createObjectURL(input.files[0]);
+        img.style.display = 'block';
+      } else { img.style.display = 'none'; }
+    });
+  });
+
+  form.addEventListener('submit', function () {
+    var b = document.getElementById('ad-invia');
+    b.disabled = true;
+    b.textContent = 'Invio in corso…';
+  });
+
+  var errori = document.getElementById('ad-riepilogo-errori');
+  if (errori) {
+    var primo = document.querySelector('.ad-errore');
+    errori.focus();
+    if (primo) { primo.parentNode.scrollIntoView({ block: 'center' }); }
+  }
+})();
+</script>
+{% endblock %}

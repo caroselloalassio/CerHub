@@ -78,6 +78,18 @@ class CerBaseView(LoginRequiredMixin, GDPRDataProtectionMixin, TemplateView):
                 
         return status
 
+def get_plant_for_user(user, pk):
+    """
+    Restituisce l'impianto solo se l'utente puo' gestirlo
+    (staff: tutti gli impianti; utente normale: solo i propri).
+    Negli altri casi solleva Http404.
+    """
+    if user.is_staff or user.is_superuser:
+        queryset = Plant.objects.all()
+    else:
+        queryset = Plant.objects.filter(owner=user)
+    return get_object_or_404(queryset, pk=pk)
+
 class BasePlantView(CerBaseView):
     """Vista base per le viste relative agli impianti"""
     model = Plant
@@ -86,6 +98,10 @@ class BasePlantView(CerBaseView):
         if self.request.user.is_staff:
             return Plant.objects.all()
         return Plant.objects.filter(owner=self.request.user)
+
+    def get_plant_if_allowed(self, pk):
+        """Impianto richiesto, oppure 404 se l'utente non puo' gestirlo"""
+        return get_plant_for_user(self.request.user, pk)
 
 class BaseCERView(CerBaseView):
     """Vista base per le viste relative alle CER"""

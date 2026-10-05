@@ -165,6 +165,24 @@
                </div>
            </div>
 
+           <!-- Adesioni e documenti firmati -->
+           <div class="card cer-card mb-4">
+               <div class="card-header">
+                   <h5 class="mb-0">Adesioni e documenti firmati</h5>
+               </div>
+               <div class="card-body">
+                   {% for a in user.adesioni.all %}
+                   <p class="mb-2">
+                       <strong>{{ a.numero }}</strong> &middot; {{ a.get_stato_display }}<br>
+                       {% if a.pdf_firmato %}<a href="{% url 'adesioni:documento' a.token 'firmata' %}?scarica"><i class="fas fa-download me-1"></i>Domanda firmata (PDF)</a>{% else %}<a href="{% url 'adesioni:riepilogo' a.token %}">Controlla e firma</a>{% endif %}
+                   </p>
+                   {% empty %}
+                   <p class="mb-2">Nessuna domanda di adesione.</p>
+                   {% endfor %}
+                   <a href="{% url 'adesioni:mie' %}" class="btn btn-cer-outline-primary btn-sm">Le mie adesioni</a>
+               </div>
+           </div>
+
            <!-- Activity -->
            <div class="card cer-card">
                <div class="card-header">

@@ -1,0 +1,23 @@
+<style>
+  .ad-wrap { max-width: 920px; }
+  .ad-card { background: var(--bs-body-bg, #fff); border: 1px solid #d9e2df; border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; }
+  .ad-card h2 { font-size: 1.15rem; font-weight: 700; color: #00796b; margin-bottom: 1rem; }
+  .ad-req::after { content: " *"; color: #c0392b; }
+  .ad-errore { color: #b3261e; font-size: .875rem; margin-top: .25rem; font-weight: 600; }
+  .ad-wrap .form-check-input { border-color: #6b7c78; }
+  .ad-wrap input[type=checkbox].form-check-input, .ad-wrap input[type=radio] { margin-top: .3em; }
+  .ad-hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+  .ad-anteprima { max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid #d9e2df; margin-top: .5rem; display: none; }
+  .ad-passi { display: flex; gap: .5rem; flex-wrap: wrap; list-style: none; padding: 0; margin: 0 0 1.5rem; }
+  .ad-passi li { flex: 1 1 140px; padding: .5rem .75rem; border-radius: 100em; background: #eef3f1; color: #4a5a56; font-size: .9rem; text-align: center; }
+  .ad-passi li.attivo { background: #00796b; color: #fff; font-weight: 700; }
+  .ad-passi li.fatto { background: #d5ece6; color: #00594f; }
+  .ad-dati dt { font-weight: 400; color: #5b6b67; font-size: .85rem; }
+  .ad-dati dd { font-weight: 600; margin-bottom: .75rem; overflow-wrap: anywhere; }
+  .ad-scelta { display: block; height: 100%; text-decoration: none; color: inherit; transition: border-color .15s, box-shadow .15s; }
+  .ad-scelta:hover, .ad-scelta:focus { border-color: #00a47f; box-shadow: 0 6px 20px rgba(0,121,107,.15); color: inherit; }
+  .ad-scelta i { font-size: 2rem; color: #00a47f; }
+  [data-bs-theme=dark] .ad-passi li { background: #26302e; color: #c9d6d2; }
+  [data-bs-theme=dark] .ad-passi li.fatto { background: #17443c; color: #d5ece6; }
+  [data-bs-theme=dark] .ad-card { border-color: #3a4744; }
+</style>

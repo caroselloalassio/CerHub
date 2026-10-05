@@ -1119,7 +1119,7 @@ class Plant(models.Model):
             
         if not self.validation_date:
             validation_errors['validation_date'] = _("La data di validazione è obbligatoria per attestati verificati")
-        elif self.validation_date > timezone.now():
+        elif self.validation_date > timezone.now().date():
             validation_errors['validation_date'] = _("La data di validazione non può essere futura")
 
         if self.expected_yearly_production is not None and self.expected_yearly_production <= 0:

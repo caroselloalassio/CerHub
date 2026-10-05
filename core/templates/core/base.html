@@ -323,7 +323,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{% url 'core:home' %}">
-                <img src="{% static 'images/cerhub-logo-white.png' %}" alt="CER Hub" class="cerhub-logo">
+                <img src="{% static 'images/cerhub-logo-white.svg' %}" alt="CER Hub" class="cerhub-logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -371,6 +371,9 @@
                             <li><a class="dropdown-item" href="{% url 'users:profile' %}">
                                 <i class="bi bi-person me-2"></i>Profilo
                             </a></li>
+                            <li><a class="dropdown-item" href="{% url 'adesioni:mie' %}">
+                                <i class="bi bi-pen me-2"></i>Le mie adesioni
+                            </a></li>
                             <li><a class="dropdown-item" href="{% url 'users:password_change' %}">
                                 <i class="bi bi-key me-2"></i>Cambia Password
                             </a></li>
@@ -396,8 +399,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:register' %}">
-                            <i class="bi bi-person-plus me-1"></i>Registrati
+                        <a class="nav-link" href="{% url 'adesioni:scelta' %}">
+                            <i class="bi bi-pen me-1"></i>Aderisci
                         </a>
                     </li>
                     {% endif %}

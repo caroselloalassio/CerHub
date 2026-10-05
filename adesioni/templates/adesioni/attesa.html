@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Firma in corso - CER Hub{% endblock %}
+{% block content %}
+{% include 'adesioni/_stile.html' %}
+<div class="container ad-wrap mt-4 mb-5 text-center">
+  {% include 'adesioni/_passi.html' with passo=2 %}
+  <div class="ad-card py-5">
+    <div class="spinner-border text-success mb-3" role="status" aria-hidden="true"></div>
+    <h1 class="h4">Stiamo preparando il documento firmato…</h1>
+    <p class="mb-0">Ci vogliono pochi secondi, la pagina si aggiorna da sola.</p>
+    <noscript><p class="mt-3"><a href="{% url 'adesioni:ritorno' adesione.token %}?n={{ n }}">Aggiorna</a></p></noscript>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>setTimeout(function () { location.replace("{% url 'adesioni:ritorno' adesione.token %}?n={{ n }}"); }, 3000);</script>
+{% endblock %}

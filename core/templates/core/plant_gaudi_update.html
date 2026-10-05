@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Aggiorna da attestato Gaudì - {{ plant.name }} - CER Hub{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav class="cer-breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:plant_list' %}">Impianti</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:plant_detail' plant.pk %}">{{ plant.name }}</a></li>
+            <li class="breadcrumb-item active">Aggiorna da attestato Gaudì</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            {% if step == "preview" %}
+            <!-- Passo 2: anteprima delle modifiche -->
+            <div class="card cer-card">
+                <div class="cer-card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Anteprima modifiche - {{ plant.name }}</h5>
+                    <span class="badge bg-primary">Passo 2 di 2</span>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning alert-permanent">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-1"></i>Conferma le modifiche</h6>
+                        <p class="mb-0">
+                            {% if changed_count %}
+                            L'attestato contiene {{ changed_count }} dat{{ changed_count|pluralize:"o,i" }} divers{{ changed_count|pluralize:"o,i" }}
+                            da quell{{ changed_count|pluralize:"o,i" }} dell'impianto. Seleziona i campi da aggiornare e conferma.
+                            {% else %}
+                            I dati dell'attestato coincidono con quelli dell'impianto. Confermando, l'attestato viene
+                            registrato tra i documenti e l'impianto risulta verificato.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if date_fallback %}
+                    <div class="alert alert-info alert-permanent">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Nell'attestato non è indicata la data di presunto esercizio: viene proposta la data di convalida.
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 3rem;">Applica</th>
+                                        <th>Campo</th>
+                                        <th>Valore attuale</th>
+                                        <th>Valore nell'attestato</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                    <tr{% if not row.changed %} class="text-muted"{% endif %}>
+                                        <td>
+                                            {% if row.changed %}
+                                            <input type="checkbox" class="form-check-input" name="fields"
+                                                   value="{{ row.field }}" id="field_{{ row.field }}"
+                                                   {% if row.checked %}checked{% endif %}
+                                                   {% if row.required %}disabled title="Dato identificativo dell'attestato: viene sempre aggiornato"{% endif %}>
+                                            {% endif %}
+                                        </td>
+                                        <td><label for="field_{{ row.field }}" class="mb-0">{{ row.label }}</label></td>
+                                        <td>{{ row.old|default:"-" }}</td>
+                                        <td>{{ row.new|default:"-" }}</td>
+                                        <td>
+                                            {% if row.changed %}
+                                            <span class="badge-cer badge-cer-warning">Diverso</span>
+                                            {% else %}
+                                            <span class="badge bg-secondary">Invariato</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Nessun dato estratto dall'attestato.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {% if has_address_rows %}
+                        <p class="form-text">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            L'indirizzo viene ricavato automaticamente dal testo dell'attestato e può contenere imprecisioni:
+                            per questo non è selezionato. Spunta i campi dell'indirizzo solo dopo averli controllati.
+                        </p>
+                        {% endif %}
+
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            <button type="submit" name="step" value="confirm" class="btn btn-cer-primary">
+                                <i class="fas fa-check me-1"></i>Conferma e aggiorna l'impianto
+                            </button>
+                            <button type="submit" name="step" value="cancel" class="btn btn-cer-secondary" formnovalidate>
+                                Annulla
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Passo 1: caricamento dell'attestato -->
+            <div class="card cer-card">
+                <div class="cer-card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Aggiorna da attestato Gaudì - {{ plant.name }}</h5>
+                    <span class="badge bg-primary">Passo 1 di 2</span>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info alert-permanent">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle me-1"></i>Come funziona</h6>
+                        <p class="mb-0">
+                            Carica l'attestato Gaudì (PDF) dell'impianto con POD <strong>{{ plant.pod_code }}</strong>.
+                            I dati vengono letti dal documento e confrontati con quelli attuali: prima di salvare
+                            potrai scegliere quali campi aggiornare.
+                        </p>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="step" value="upload">
+                        <div class="mb-3">
+                            <label for="{{ form.gaudi_file.id_for_label }}" class="form-label">{{ form.gaudi_file.label }}</label>
+                            {{ form.gaudi_file }}
+                            {% for error in form.gaudi_file.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text">File PDF, dimensione massima 10 MB.</div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="submit" class="btn btn-cer-primary">
+                                <i class="fas fa-upload me-1"></i>Carica e confronta
+                            </button>
+                            <a href="{% url 'core:plant_detail' plant.pk %}" class="btn btn-cer-secondary">Annulla</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

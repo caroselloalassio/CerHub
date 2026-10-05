@@ -140,11 +140,17 @@ canvas {
                             <li><a class="dropdown-item" href="{% url 'core:plant_update' plant.pk %}">
                                 <i class="fas fa-edit me-2"></i>Modifica
                             </a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:plant_documents' plant.pk %}">
+                                <i class="fas fa-folder-open me-2"></i>Documenti
+                            </a></li>
                             <li><a class="dropdown-item" href="{% url 'documents:upload' plant.pk %}">
                                 <i class="fas fa-file-upload me-2"></i>Carica Documento
                             </a></li>
-                            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#gaudiUploadModal">
-                                <i class="fas fa-certificate me-2"></i>Carica Attestato Gaudì
+                            <li><a class="dropdown-item" href="{% url 'core:plant_gaudi_update' plant.pk %}">
+                                <i class="fas fa-certificate me-2"></i>Aggiorna da Attestato Gaudì
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'core:plant_mqtt_config' plant.pk %}">
+                                <i class="fas fa-network-wired me-2"></i>Configurazione MQTT
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="#" onclick="confirmDelete()">
@@ -214,11 +220,10 @@ canvas {
                                 <span class="badge-cer badge-cer-warning">
                                     <i class="fas fa-exclamation-circle me-1"></i>Non verificato
                                 </span>
-                                <button class="btn btn-sm btn-cer-outline-primary mt-2" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#gaudiUploadModal">
+                                <a class="btn btn-sm btn-cer-outline-primary mt-2"
+                                   href="{% url 'core:plant_gaudi_update' plant.pk %}">
                                     <i class="fas fa-upload me-1"></i>Carica Attestato
-                                </button>
+                                </a>
                             {% endif %}
                         </dd>
                     </dl>
@@ -260,6 +265,9 @@ canvas {
                         </div>
                         <span class="badge" id="mqtt-badge">--</span>
                     </div>
+                    <a href="{% url 'core:plant_mqtt_config' plant.pk %}" class="btn btn-sm btn-cer-outline-primary">
+                        <i class="fas fa-cog me-1"></i>Configurazione MQTT
+                    </a>
                     
                     {% if device %}
                     <div class="mt-3">
@@ -278,8 +286,6 @@ canvas {
         </div>
     </div>
 
-    <!-- Modal Upload Attestato Gaudì -->
-    {% include "documents/gaudi_upload_modal.html" %}
 </div>
 {% endblock %}
 

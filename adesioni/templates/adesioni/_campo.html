@@ -1,0 +1,25 @@
+{% with tipo=f.field.widget.input_type %}
+<div class="{{ col|default:'col-md-6' }} mb-3">
+  {% if tipo == 'radio' %}
+    <span class="form-label d-block{% if f.field.required %} ad-req{% endif %}" id="lbl_{{ f.html_name }}">{{ f.label }}</span>
+    <div role="radiogroup" aria-labelledby="lbl_{{ f.html_name }}">
+    {% for r in f %}
+      <div class="form-check{% if inline %} form-check-inline{% endif %}">
+        {{ r.tag }}
+        <label class="form-check-label" for="{{ r.id_for_label }}">{{ r.choice_label }}</label>
+      </div>
+    {% endfor %}
+    </div>
+  {% elif tipo == 'checkbox' %}
+    <div class="form-check">
+      {{ f }}
+      <label class="form-check-label{% if f.field.required %} ad-req{% endif %}" for="{{ f.id_for_label }}">{{ f.label }}</label>
+    </div>
+  {% else %}
+    <label class="form-label{% if f.field.required %} ad-req{% endif %}" for="{{ f.id_for_label }}">{{ f.label }}</label>
+    {{ f }}
+  {% endif %}
+  {% if f.help_text %}<div class="form-text">{{ f.help_text }}</div>{% endif %}
+  {% for e in f.errors %}<div class="ad-errore" role="alert">{{ e }}</div>{% endfor %}
+</div>
+{% endwith %}

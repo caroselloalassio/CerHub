@@ -737,8 +737,23 @@ class PlantForm(forms.ModelForm):
 
         return cleaned_data
 
-class PlantMQTTConfigForm(forms.ModelForm):
-    """Form per la configurazione MQTT di un impianto"""
+class PlantMQTTConfigForm(forms.Form):
+    """
+    Form per la configurazione MQTT di un impianto.
+
+    Non è un ModelForm di proposito: aggiorna solo i parametri MQTT
+    dell'impianto passato come `instance`, senza rieseguire la validazione
+    dell'intero impianto (adesione alla CER, dati Gaudì).
+    """
+
+    MQTT_FIELDS = [
+        'mqtt_broker',
+        'mqtt_port',
+        'mqtt_username',
+        'mqtt_password',
+        'mqtt_topic_prefix',
+        'use_ssl'
+    ]
     
     mqtt_broker = forms.CharField(
         label=_("Broker MQTT"),
@@ -755,7 +770,8 @@ class PlantMQTTConfigForm(forms.ModelForm):
         label=_("Porta MQTT"),
         required=True,
         initial=1883,
-        validators=[MinValueValidator(1)],
+        min_value=1,
+        max_value=65535,
         widget=forms.NumberInput(attrs={'class': 'form-control'}),
         help_text=_("Porta del broker (1883 standard, 8883 SSL/TLS)")
     )
@@ -772,8 +788,12 @@ class PlantMQTTConfigForm(forms.ModelForm):
         label=_("Password MQTT"),
         max_length=255,
         required=False,
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
-        help_text=_("Password per l'autenticazione (opzionale)")
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'autocomplete': 'new-password'
+        }),
+        help_text=_("Password per l'autenticazione (opzionale). "
+                    "Lascia vuoto per mantenere la password già salvata.")
     )
     
     mqtt_topic_prefix = forms.CharField(
@@ -792,16 +812,24 @@ class PlantMQTTConfigForm(forms.ModelForm):
         help_text=_("Attiva la connessione sicura SSL/TLS")
     )
 
-    class Meta:
-        model = Plant
-        fields = [
-            'mqtt_broker',
-            'mqtt_port',
-            'mqtt_username',
-            'mqtt_password',
-            'mqtt_topic_prefix',
-            'use_ssl'
-        ]
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
+        if instance is not None:
+            initial = {
+                'mqtt_broker': instance.mqtt_broker or '',
+                'mqtt_port': instance.mqtt_port,
+                'mqtt_username': instance.mqtt_username or '',
+                'mqtt_topic_prefix': instance.mqtt_topic_prefix,
+                'use_ssl': instance.use_ssl,
+            }
+            # La password salvata non viene mai rimandata al browser
+            initial.update(kwargs.get('initial') or {})
+            kwargs['initial'] = initial
+        super().__init__(*args, **kwargs)
+
+    @property
+    def has_saved_password(self):
+        return bool(self.instance is not None and self.instance.mqtt_password)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -816,10 +844,27 @@ class PlantMQTTConfigForm(forms.ModelForm):
             cleaned_data['mqtt_topic_prefix'] = f"{topic_prefix}/"
         
         # Validazione credenziali
-        if cleaned_data.get('mqtt_username') and not cleaned_data.get('mqtt_password'):
-            self.add_error('mqtt_password', _('Password richiesta con username'))
+        if not cleaned_data.get('mqtt_username'):
+            # Senza username non si conserva alcuna password
+            cleaned_data['mqtt_password'] = ''
+        elif not cleaned_data.get('mqtt_password'):
+            if self.has_saved_password:
+                # Campo lasciato vuoto: resta valida la password già salvata
+                cleaned_data['mqtt_password'] = self.instance.mqtt_password
+            else:
+                self.add_error('mqtt_password', _('Password richiesta con username'))
         
         return cleaned_data
+
+    def save(self):
+        """Salva sull'impianto solo i parametri MQTT"""
+        plant = self.instance
+        for field in self.MQTT_FIELDS:
+            setattr(plant, field, self.cleaned_data[field])
+        # do_geocoding=False: il salvataggio dei parametri MQTT non deve
+        # far partire la geocodifica dell'indirizzo
+        plant.save(update_fields=self.MQTT_FIELDS, do_geocoding=False)
+        return plant
 
 class GDPRConsentForm(forms.Form):
     """Form per la gestione dei consensi GDPR"""
@@ -895,7 +940,7 @@ class PlantGaudiUpdateForm(forms.Form):
     def clean_gaudi_file(self):
         file = self.cleaned_data.get('gaudi_file')
         if file:
-            if not file.name.endswith('.pdf'):
+            if not file.name.lower().endswith('.pdf'):
                 raise forms.ValidationError(_("È possibile caricare solo file PDF"))
             if file.size > 10 * 1024 * 1024:  # 10MB
                 raise forms.ValidationError(_("Il file non può superare i 10MB"))

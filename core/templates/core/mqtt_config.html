@@ -2,18 +2,116 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+{% block title %}Configurazione MQTT - {{ plant.name }} - CER Hub{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2>Configurazione MQTT per {{ plant.name }}</h2>
-    
-    <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        
-        <div class="mt-3">
-            <button type="submit" class="btn btn-cer-primary">Salva configurazione</button>
-            <a href="{% url 'core:plant_detail' plant.pk %}" class="btn btn-cer-secondary">Annulla</a>
+    <nav class="cer-breadcrumb" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:plant_list' %}">Impianti</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'core:plant_detail' plant.pk %}">{{ plant.name }}</a></li>
+            <li class="breadcrumb-item active">Configurazione MQTT</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-1">Configurazione MQTT</h2>
+    <p class="text-muted">{{ plant.name }} &middot; POD {{ plant.pod_code }}</p>
+
+    <div class="row">
+        <div class="col-lg-7 mb-4">
+            <div class="card cer-card">
+                <div class="cer-card-header">
+                    <h5 class="mb-0">Parametri del broker per questo impianto</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+
+                        {% if form.has_saved_password %}
+                        <p class="form-text"><i class="fas fa-key me-1"></i>Per questo impianto &egrave; gi&agrave; salvata una password.</p>
+                        {% endif %}
+
+                        <div class="mt-3 d-flex flex-wrap gap-2">
+                            <button type="submit" name="action" value="save" class="btn btn-cer-primary">
+                                <i class="fas fa-save me-1"></i>Salva configurazione
+                            </button>
+                            {% if user.is_staff %}
+                            <button type="submit" name="action" value="test" class="btn btn-cer-outline-primary">
+                                <i class="fas fa-plug me-1"></i>Salva e prova connessione
+                            </button>
+                            {% endif %}
+                            <a href="{% url 'core:plant_detail' plant.pk %}" class="btn btn-cer-secondary">Annulla</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    </form>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card cer-card mb-4">
+                <div class="cer-card-header">
+                    <h5 class="mb-0">Stato attuale</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="me-auto">
+                            <h6 class="mb-1">Ricezione dati</h6>
+                            <small class="text-muted">
+                                {% if mqtt_status.last_seen %}
+                                    Ultimo dato ricevuto il {{ mqtt_status.last_seen|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    Nessun dato ricevuto finora
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% if mqtt_status.connected %}
+                            <span class="badge-cer badge-cer-success">Online</span>
+                        {% else %}
+                            <span class="badge-cer badge-cer-warning">Offline</span>
+                        {% endif %}
+                    </div>
+
+                    <h6 class="mb-2">Dispositivi collegati all'impianto</h6>
+                    {% if devices %}
+                    <ul class="list-unstyled mb-0">
+                        {% for device in devices %}
+                        <li class="mb-2">
+                            <strong>{{ device.device_id }}</strong>
+                            {% if not device.is_active %}<span class="badge-cer badge-cer-warning ms-1">Disattivato</span>{% endif %}
+                            {% if device.mqtt_topic_template %}
+                            <br><code class="small">{{ device.mqtt_topic_template }}</code>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted mb-0">Nessun dispositivo associato a questo impianto.</p>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'energy:devices' %}" class="btn btn-sm btn-cer-outline-primary">
+                            <i class="fas fa-microchip me-1"></i>Gestisci dispositivi
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info alert-permanent mb-0">
+                <h6 class="alert-heading"><i class="fas fa-info-circle me-1"></i>Come vengono usati questi parametri</h6>
+                <p class="mb-2">
+                    Le misure dei dispositivi vengono ricevute da CER Hub attraverso il broker MQTT
+                    centrale della piattaforma{% if user.is_staff %}
+                    (<a href="{% url 'energy:mqtt_settings' %}" class="alert-link">impostazioni del broker centrale</a>){% endif %}.
+                </p>
+                <p class="mb-0">
+                    I parametri di questa pagina vengono salvati come dati dell'impianto (ad esempio quando
+                    l'impianto dispone di un proprio broker). Il Client ID assegnato all'impianto &egrave;
+                    <code>{{ plant.mqtt_client_id }}</code>.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
