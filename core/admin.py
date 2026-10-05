@@ -588,3 +588,34 @@ admin_site.register(CERMembership, CERMembershipAdmin)
 admin_site.register(Plant, PlantAdmin)
 admin_site.register(PlantMeasurement, PlantMeasurementAdmin)
 admin_site.register(PlantDocument, PlantDocumentAdmin)
+
+# --- Utenti -------------------------------------------------------------------
+# Senza questa registrazione l'amministratore non aveva modo di creare o
+# gestire gli utenti dal pannello.
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+
+
+class CustomUserAdmin(UserAdmin):
+    list_display = ['username', 'email', 'first_name', 'last_name', 'legal_type', 'is_active', 'is_staff']
+    list_filter = ['is_active', 'is_staff', 'is_superuser', 'legal_type']
+    search_fields = ['username', 'email', 'first_name', 'last_name', 'fiscal_code', 'vat_number', 'legal_name']
+    readonly_fields = ['privacy_accepted', 'privacy_acceptance_date', 'privacy_last_update', 'last_login', 'date_joined']
+    fieldsets = UserAdmin.fieldsets + (
+        ('Dati anagrafici e fiscali', {
+            'fields': ('legal_type', 'profit_type', 'fiscal_code', 'address', 'phone',
+                       'vat_number', 'legal_name', 'pec', 'sdi_code'),
+        }),
+        ('Privacy', {
+            'fields': ('privacy_accepted', 'privacy_acceptance_date', 'privacy_last_update'),
+        }),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'first_name', 'last_name', 'password1', 'password2'),
+        }),
+    )
+
+
+admin_site.register(get_user_model(), CustomUserAdmin)

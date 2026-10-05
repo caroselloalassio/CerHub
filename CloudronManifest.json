@@ -1,7 +1,7 @@
 {
   "id": "it.cerhub.app",
   "title": "CerHub",
-  "author": "Carosello S.n.c.",
+  "author": "CER Hub",
   "description": "Gestione delle Comunità Energetiche Rinnovabili (fork di CerCollettiva).",
   "tagline": "Gestione comunità energetiche rinnovabili",
   "version": "1.0.0",
@@ -16,7 +16,7 @@
   },
   "manifestVersion": 2,
   "website": "https://github.com/caroselloalassio/CerHub",
-  "contactEmail": "marco@carosello.net",
+  "contactEmail": "info@cerhub.it",
   "icon": "file://cloudron/logo.png",
   "tags": [ "energy", "cer", "django" ],
   "memoryLimit": 1073741824,
