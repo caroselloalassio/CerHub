@@ -1,7 +1,7 @@
 # core/views/dashboard.py
 
 from django.views.generic import TemplateView
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Min, Max
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
@@ -17,7 +17,7 @@ from ..models import (
     Alert
 )
 
-from energy.models import DeviceMeasurement
+from energy.models import DeviceMeasurement, DeviceConfiguration
 
 class HomeView(TemplateView):
     """Vista homepage pubblica"""
@@ -266,10 +266,15 @@ class CerDashboardView(CerBaseView, StaffRequiredMixin):
             timestamp__gte=start_date
         )
         
+        # Energia della settimana: differenza del contatore (energy_total)
+        # tra prima e ultima lettura di ciascun dispositivo
+        per_device = measurements.filter(energy_total__isnull=False).values('device').annotate(
+            first=Min('energy_total'), last=Max('energy_total')
+        )
+        total_energy = sum((row['last'] or 0) - (row['first'] or 0) for row in per_device)
+
         return {
-            'total_energy': measurements.aggregate(
-                total=Sum('value')
-            )['total'] or 0,
+            'total_energy': total_energy,
             'active_devices': DeviceConfiguration.objects.filter(
                 measurements__timestamp__gte=start_date
             ).distinct().count(),

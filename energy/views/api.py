@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.throttling import UserRateThrottle
-from django.db.models import Avg, Max, Min, Count
+from django.db.models import Avg, Max, Min, Count, Sum
 from django.utils import timezone
 from datetime import timedelta
 

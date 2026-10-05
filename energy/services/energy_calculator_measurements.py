@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Any
 from django.utils import timezone
-from django.db.models import F, Sum
+from django.db.models import F, Max, Sum
 from django.db import transaction
 from django.core.cache import cache
 import logging

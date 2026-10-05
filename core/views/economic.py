@@ -5,6 +5,7 @@ from django.db.models import Sum, Count, Q, Avg
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 from decimal import Decimal

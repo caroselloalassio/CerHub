@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import logging
 from typing import Dict, Any, Optional, List
 from django.utils import timezone
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.core.cache import cache

@@ -9,6 +9,9 @@ from django.db.models import Sum, Q, Avg, Count
 from django.utils import timezone
 from django.http import JsonResponse
 from django.urls import reverse_lazy
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .base import BasePlantView
 from ..models import Plant, CERConfiguration

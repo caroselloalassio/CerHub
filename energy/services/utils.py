@@ -1,6 +1,7 @@
 # energy/services/utils.py
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
+from django.db import models
 from django.db.models import Avg, Max, Min, Sum, Q
 from django.utils import timezone
 from ..models import (

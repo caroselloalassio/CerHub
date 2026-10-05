@@ -33,52 +33,8 @@ class CERAdminSite(admin.AdminSite):
         return custom_urls + urls
 
     def cer_list_view(self, request):
-        """Lista CER con ricerca e filtri"""
-        # Debug log
-        print(f"User: {request.user}")
-        print(f"Staff: {request.user.is_staff}")
-        
-        search_query = request.GET.get('q', '')
-        status_filter = request.GET.get('status', '')
-        
-        # Query base
-        cer_list = CERConfiguration.objects.all()
-        
-        # Debug log
-        print(f"Numero totale CER: {cer_list.count()}")
-        
-        # Applica filtri
-        if search_query:
-            cer_list = cer_list.filter(name__icontains=search_query)
-        
-        if status_filter:
-            is_active = status_filter == 'active'
-            cer_list = cer_list.filter(is_active=is_active)
-        
-        # Ordinamento
-        cer_list = cer_list.order_by('-created_at')
-        
-        # Paginazione
-        paginator = Paginator(cer_list, 10)
-        page = request.GET.get('page')
-        object_list = paginator.get_page(page)
-        
-        context = {
-            'object_list': object_list,
-            'search_query': search_query,
-            'status_filter': status_filter,
-            'total_count': CERConfiguration.objects.count(),
-            'active_count': CERConfiguration.objects.filter(is_active=True).count(),
-            'opts': CERConfiguration._meta,  # Importante per i template admin
-            'title': 'Gestione CER',
-            'cl': object_list,  # Per compatibilità con i template admin
-            'is_popup': False,
-            'has_add_permission': request.user.has_perm('core.add_cerconfiguration'),
-            'has_change_permission': request.user.has_perm('core.change_cerconfiguration'),
-            'has_delete_permission': request.user.has_perm('core.delete_cerconfiguration'),
-        }
-        
-        return render(request, 'admin/dashboard/change_list.html', context)
+        """Vecchio indirizzo della lista CER: porta alla lista standard dell'admin"""
+        return redirect('ceradmin:core_cerconfiguration_changelist')
 
     def index(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -93,7 +49,6 @@ class CERConfigurationAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     readonly_fields = ['created_at', 'updated_at']
     
-    change_list_template = 'admin/dashboard/change_list.html'
     change_form_template = 'admin/dashboard/change_form.html'
     delete_confirmation_template = 'admin/dashboard/delete_confirmation.html'
 
@@ -110,10 +65,6 @@ class CERConfigurationAdmin(admin.ModelAdmin):
         """Reindirizza alla lista dopo la modifica"""
         return self.response_post_save_change(request, obj)
     
-    def changelist_view(self, request, extra_context=None):
-        """Override della vista lista per reindirizzare alla nostra vista custom"""
-        return self.admin_site.cer_list_view(request)
-
     def get_deleted_objects(self, objs, request):
         """Personalizza gli oggetti mostrati nella pagina di conferma eliminazione"""
         deletable_objects, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)

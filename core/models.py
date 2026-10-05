@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 #from energy.models import DeviceMeasurement, DeviceConfiguration
 from paho.mqtt.client import CallbackAPIVersion
 from django.db import models
+from django.db.models import Max, Sum
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -1148,6 +1149,9 @@ class Plant(models.Model):
         """
         time_threshold = timezone.now() - timedelta(minutes=time_window_minutes)
         
+        # Import locale: energy.models dipende da core.models
+        from energy.models import DeviceMeasurement
+
         # Costruisci la query base
         query = DeviceMeasurement.objects.filter(
             device__is_active=True,

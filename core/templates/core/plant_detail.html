@@ -140,7 +140,7 @@ canvas {
                             <li><a class="dropdown-item" href="{% url 'core:plant_update' plant.pk %}">
                                 <i class="fas fa-edit me-2"></i>Modifica
                             </a></li>
-                            <li><a class="dropdown-item" href="{% url 'core:plant_document_upload' plant.pk %}">
+                            <li><a class="dropdown-item" href="{% url 'documents:upload' plant.pk %}">
                                 <i class="fas fa-file-upload me-2"></i>Carica Documento
                             </a></li>
                             <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#gaudiUploadModal">

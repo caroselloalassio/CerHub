@@ -47,7 +47,8 @@ notify() { # $1=titolo $2=testo $3=priorità
 }
 fail() { echo "ERRORE: $1"; notify "CerHub: aggiornamento fallito" "$1" high; exit 1; }
 state() { cat "$STATE/$1" 2>/dev/null || echo "${2:-}"; }
-healthy() { curl -s -m 10 "$HEALTH_URL" | grep -q '"status": *"healthy"'; }
+# interroga il reverse proxy locale: non dipende dal DNS pubblico
+healthy() { curl -s -m 10 --resolve "$APP:443:127.0.0.1" "$HEALTH_URL" | grep -q '"status": *"healthy"'; }
 wait_healthy() { for _ in $(seq 1 36); do healthy && return 0; sleep 10; done; return 1; }
 bump() { python3 -c "v='$1'.split('.'); v[2]=str(int(v[2])+1); print('.'.join(v))"; }
 set_manifest() { # $1=cartella $2=versione $3=commit
