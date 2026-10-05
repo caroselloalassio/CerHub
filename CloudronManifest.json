@@ -1,0 +1,25 @@
+{
+  "id": "it.cerhub.app",
+  "title": "CerHub",
+  "author": "Carosello S.n.c.",
+  "description": "Gestione delle Comunità Energetiche Rinnovabili (fork di CerCollettiva).",
+  "tagline": "Gestione comunità energetiche rinnovabili",
+  "version": "1.0.0",
+  "upstreamVersion": "3681b82",
+  "healthCheckPath": "/monitoring/health/",
+  "httpPort": 8000,
+  "addons": {
+    "localstorage": {},
+    "postgresql": {},
+    "redis": {},
+    "sendmail": { "supportsDisplayName": true }
+  },
+  "manifestVersion": 2,
+  "website": "https://github.com/caroselloalassio/CerHub",
+  "contactEmail": "marco@carosello.net",
+  "icon": "file://cloudron/logo.png",
+  "tags": [ "energy", "cer", "django" ],
+  "memoryLimit": 1073741824,
+  "minBoxVersion": "8.0.0",
+  "postInstallMessage": "Al primo accesso l'app chiede di creare l'utente amministratore (pagina /setup/). Fallo subito: finché non esiste un amministratore la pagina è aperta a chiunque.\n\nPannello di amministrazione: /ceradmin/"
+}
