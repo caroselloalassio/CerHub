@@ -37,6 +37,11 @@ ALLOWED_HOSTS.extend(h for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h)
 CSRF_TRUSTED_ORIGINS = [APP_ORIGIN]
 
 # --- Applicazioni e middleware ------------------------------------------------
+# Google Analytics dell'associazione CER Hub (flusso "app.cerhub.it");
+# viene caricato solo dopo il consenso dell'utente. Vuoto = disattivato.
+GA_MEASUREMENT_ID = os.getenv('GA_MEASUREMENT_ID', 'G-DD20KVR90S')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('cercollettiva.cloudron_context.analytics')
+
 MIDDLEWARE = MIDDLEWARE + [
     # Al primo accesso, se non esiste un amministratore, porta al setup iniziale
     'core.middleware.FirstInstallationMiddleware',

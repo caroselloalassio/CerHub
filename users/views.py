@@ -56,6 +56,7 @@ def register(request):
                 user.privacy_accepted = True  # Aggiungi questa riga
                 user.privacy_acceptance_date = timezone.now()
                 user.save()
+                request.session['ga_events'] = ['sign_up']
                 messages.success(request, 'Registrazione completata. Puoi ora effettuare il login.')
                 return redirect('users:login')
             else:

@@ -1,0 +1,14 @@
+{% load static %}{# Consenso cookie e Google Analytics (solo dopo il consenso). Vedi static/js/cerhub-consent.js #}
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', analytics_storage: 'denied'});
+    window.CERHUB_CONSENT = {
+        policyUrl: "{% url 'users:cookie_policy' %}",
+        gaId: {% if GA_MEASUREMENT_ID %}"{{ GA_MEASUREMENT_ID|escapejs }}"{% else %}null{% endif %},
+        {# Nelle pagine riservate il titolo può contenere nomi di persone o impianti: ad Analytics va un titolo generico #}
+        gaConfig: {% if user.is_authenticated %}{page_title: "Area soci", area: "riservata"}{% else %}{area: "pubblica"}{% endif %},
+        events: [{% for e in ga_events %}{name: "{{ e|escapejs }}"}{% if not forloop.last %}, {% endif %}{% endfor %}]
+    };
+</script>
+<script src="{% static 'js/cerhub-consent.js' %}" defer></script>

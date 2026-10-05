@@ -492,6 +492,7 @@
     {% block extra_css %}{% endblock %}
     <!-- Identità visiva CER Hub -->
     <link rel="stylesheet" href="{% static 'css/cerhub-brand.css' %}">
+    {% include 'includes/cerhub_consent.html' %}
 </head>
 <body class="{% if show_navbar == False %}hide-navbar{% endif %}">
     <!-- Navbar -->
@@ -641,8 +642,11 @@
                         <a href="{% url 'users:privacy_policy' %}" class="text-decoration-none me-3">
                             <i class="fas fa-shield-alt me-1"></i>Privacy
                         </a>
-                        <a href="{% url 'users:cookie_policy' %}" class="text-decoration-none">
+                        <a href="{% url 'users:cookie_policy' %}" class="text-decoration-none me-3">
                             <i class="fas fa-cookie-bite me-1"></i>Cookie
+                        </a>
+                        <a href="#" class="text-decoration-none js-cerhub-cookie-prefs">
+                            <i class="fas fa-sliders-h me-1"></i>Preferenze cookie
                         </a>
                     </div>
                     <p class="mb-0"><small>Basato sul software open source <a href="https://github.com/atomozero/CerCollettiva" class="text-decoration-none">CerCollettiva</a></small></p>

@@ -316,6 +316,7 @@
     </style>
     <!-- Identità visiva CER Hub -->
     <link rel="stylesheet" href="{% static 'css/cerhub-brand.css' %}">
+    {% include 'includes/cerhub_consent.html' %}
 </head>
 <body>
     <!-- Navbar -->
@@ -446,6 +447,8 @@
                     <a href="{% url 'users:cookie_policy' %}" class="text-secondary text-decoration-none">
                         <i class="bi bi-cookie me-1"></i>Cookie
                     </a>
+                    <span class="mx-2 text-secondary">·</span>
+                    <a href="#" class="text-secondary text-decoration-none js-cerhub-cookie-prefs">Preferenze cookie</a>
                 </div>
                 <div class="col-auto">
                     <span class="text-secondary">© 2024 Andrea Bernardi</span>

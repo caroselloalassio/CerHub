@@ -12,7 +12,9 @@ logger = logging.getLogger('access_logger')
 logger.setLevel(logging.INFO)
 
 # Handler per file
-file_handler = logging.FileHandler(settings.BASE_DIR / 'logs' / 'access_logs.log')
+from logging.handlers import TimedRotatingFileHandler
+# Conservazione del registro accessi: 12 mesi (52 file settimanali)
+file_handler = TimedRotatingFileHandler(settings.BASE_DIR / 'logs' / 'access_logs.log', when='W0', backupCount=52, encoding='utf-8')
 file_handler.setLevel(logging.INFO)
 
 # Handler per console (utile in development)
@@ -34,6 +36,10 @@ def log_user_login(sender, request, user, **kwargs):
     """
     ip_address = request.META.get('REMOTE_ADDR', 'unknown')
     user_agent = request.META.get('HTTP_USER_AGENT', 'unknown')
+
+    # Evento statistico anonimo (inviato solo se l'utente ha acconsentito ai cookie statistici)
+    if hasattr(request, 'session'):
+        request.session['ga_events'] = ['login']
     
     logger.info(
         f"Login riuscito - Utente: {user.username} - "

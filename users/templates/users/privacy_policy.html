@@ -1,230 +1,139 @@
 {% extends 'base.html' %}
-{% block title %}Privacy Policy - CerCollettiva{% endblock %}
+{% block title %}Privacy Policy - CER Hub{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-
-
+<div class="container mt-4 mb-5">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card cer-card">
                 <div class="card-header">
-                    <h5 class="mb-0">Informativa sulla Privacy per il progetto Open Source CerCollettiva</h5>
-                    <p class="small mt-2">
-                        Data dell'ultimo aggiornamento: 27 ottobre 2023
-                    </p>
-                    <p class="small">
-                        Questa informativa è un modello generico destinato agli utilizzatori del software CerCollettiva e deve essere adattata da ciascun soggetto che implementa e utilizza il software, in base alle specifiche modalità di utilizzo e alle leggi applicabili nella propria giurisdizione.
-                    </p>
-                    <p class="small text-danger">
-                        IMPORTANTE: Consultare un legale specializzato in protezione dei dati per garantire la conformità al GDPR e alle altre leggi applicabili.
-                    </p>
-                    <p class="small">
-                        Questo progetto è distribuito con licenza MIT. La licenza MIT non include alcuna garanzia o responsabilità in relazione al trattamento dei dati personali. Chi utilizza il software è l'unico responsabile del trattamento dei dati personali effettuato tramite il software stesso.
-                    </p>
+                    <h5 class="mb-0">Informativa sul trattamento dei dati personali &ndash; area soci app.cerhub.it</h5>
+                    <p class="small mt-2 mb-0">Ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (GDPR). Ultimo aggiornamento: 5 ottobre 2026</p>
                 </div>
-
                 <div class="card-body">
-                    <div class="privacy-content">
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">1. Titolare del Trattamento</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere compilata dall'utilizzatore del software che diventerà il Titolare del trattamento]
-                            </p>
-                            <p>Il Titolare del trattamento è la persona fisica o giuridica che determina le finalità e i mezzi del trattamento dei dati personali. Se utilizzi il software CerCollettiva per gestire una comunità energetica o per altre finalità che comportano il trattamento di dati personali, sei tu il Titolare del trattamento.</p>
-                            <ul>
-                                <li><strong>Titolare del Trattamento:</strong> <span class="text-danger">[Inserire nome e cognome o denominazione sociale]</span></li>
-                                <li><strong>Sede legale:</strong> <span class="text-danger">[Inserire indirizzo completo]</span></li>
-                                <li><strong>Email di contatto:</strong> <span class="text-danger">[Inserire indirizzo email]</span></li>
-                                <li><strong>Numero di telefono:</strong> <span class="text-danger">[Inserire numero di telefono]</span></li>
-                            </ul>
-                            <ul class="mt-3">
-                                <li><strong>Responsabile della Protezione dei Dati (DPO):</strong> <span class="text-danger">[Se nominato, inserire Nome e Cognome del DPO]</span></li>
-                                <li><strong>Contatti del DPO:</strong> <span class="text-danger">[Se nominato, inserire indirizzo email del DPO]</span></li>
-                            </ul>
-                            <p class="small fst-italic">Se la tua attività prevede un monitoraggio regolare e sistematico di dati personali su larga scala o il trattamento di categorie particolari di dati, è consigliabile nominare un DPO e indicarne i dati di contatto.</p>
-                        </section>
 
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">2. Finalità del Trattamento e Tipologie di Dati Trattati</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere modificata dall'utilizzatore del software in base alle specifiche finalità per cui utilizza il software]
-                            </p>
-                            <p>Il software CerCollettiva può essere utilizzato per diverse finalità, tra cui:</p>
-                            <ul class="list-unstyled ps-3">
-                                <li class="mb-2">
-                                    <strong>2.1 Gestione della registrazione e dell'account utente:</strong>
-                                    <ul>
-                                        <li><strong>Finalità:</strong> Per consentire agli utenti di registrarsi, creare e gestire il proprio account, accedere alle funzionalità del software e gestire le proprie preferenze.</li>
-                                        <li><strong>Dati trattati (esempio):</strong> <span class="text-danger">Nome, cognome, indirizzo email, password, data di nascita (se richiesta), numero di telefono (se richiesto), indirizzo (se richiesto).</span></li>
-                                    </ul>
-                                </li>
-                                <li class="mb-2">
-                                    <strong>2.2 Gestione delle comunità energetiche:</strong>
-                                    <ul>
-                                        <li><strong>Finalità:</strong> Per permettere agli utenti di partecipare alle comunità energetiche, gestire la produzione e il consumo di energia, facilitare la condivisione di energia tra i membri, fornire informazioni relative alla comunità energetica e ai servizi correlati.</li>
-                                        <li><strong>Dati trattati (esempio):</strong> <span class="text-danger">Dati relativi al consumo e alla produzione di energia, ubicazione dell'impianto, dati relativi agli accordi di condivisione energetica, dati di contatto dei membri della comunità energetica (con il loro consenso, se necessario).</span></li>
-                                    </ul>
-                                </li>
-                                <li class="mb-2">
-                                    <strong>2.3 Adempimenti legali e fiscali:</strong>
-                                    <ul>
-                                        <li><strong>Finalità:</strong> Per adempiere agli obblighi previsti dalla legge, da regolamenti, dalla normativa comunitaria o da un ordine dell'Autorità.</li>
-                                        <li><strong>Dati trattati (esempio):</strong> <span class="text-danger">Dati anagrafici, codice fiscale, partita IVA (se applicabile), dati di fatturazione.</span></li>
-                                    </ul>
-                                </li>
-                                <li class="mb-2">
-                                    <strong>2.4 Comunicazioni di servizio:</strong>
-                                    <ul>
-                                        <li><strong>Finalità:</strong> Per inviare agli utenti comunicazioni relative al servizio, come aggiornamenti, notifiche di sistema, informazioni sulla sicurezza dell'account, modifiche alle condizioni d'uso o all'informativa sulla privacy.</li>
-                                        <li><strong>Dati trattati (esempio):</strong> <span class="text-danger">Indirizzo email, numero di telefono (se fornito).</span></li>
-                                    </ul>
-                                </li>
-                                <li class="mb-2">
-                                    <strong>2.5 Marketing e comunicazioni promozionali (solo con il consenso esplicito):</strong>
-                                    <ul>
-                                        <li><strong>Finalità:</strong> Per inviare newsletter, offerte speciali, promozioni e informazioni su nuovi servizi.</li>
-                                        <li><strong>Dati trattati (esempio):</strong> <span class="text-danger">Indirizzo email, nome, cognome, preferenze di marketing.</span></li>
-                                        <li><strong class="text-danger">Nota:</strong> È necessario ottenere un consenso separato e specifico per questa finalità.</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <p class="text-danger">Specificare qui le finalità per cui si utilizza il software e i dati trattati per ciascuna finalità.</p>
-                        </section>
+                    <h6>1. Titolare del trattamento</h6>
+                    <p>
+                        <strong>CER Hub</strong>, associazione non riconosciuta<br>
+                        Sede: viale Martiri della Libert&agrave; 6, 17031 Albenga (SV)<br>
+                        Codice Fiscale: 90076120097<br>
+                        Email: <a href="mailto:info@cerhub.it">info@cerhub.it</a>
+                    </p>
+                    <p>L'associazione non ha nominato un Responsabile della protezione dei dati (DPO). Per ogni richiesta puoi scrivere all'indirizzo indicato sopra.</p>
 
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">3. Base Giuridica del Trattamento</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere modificata dall'utilizzatore del software in base alle basi giuridiche applicabili alle finalità del trattamento]
-                            </p>
-                            <p>Le basi giuridiche del trattamento dei dati personali dipendono dalle finalità per cui i dati vengono trattati. Le basi giuridiche più comuni sono:</p>
-                            <ul class="list-unstyled ps-3">
-                                <li class="mb-2"><strong>3.1 Esecuzione di un contratto:</strong> Il trattamento è necessario per l'esecuzione di un contratto di cui l'interessato è parte o per l'esecuzione di misure precontrattuali adottate su richiesta dello stesso.</li>
-                                <li class="mb-2"><strong>3.2 Adempimento di obblighi legali:</strong> Il trattamento è necessario per adempiere a un obbligo legale al quale è soggetto il Titolare del trattamento.</li>
-                                <li class="mb-2"><strong>3.3 Legittimo interesse:</strong> Il trattamento è necessario per il perseguimento del legittimo interesse del Titolare del trattamento o di terzi, a condizione che non prevalgano gli interessi o i diritti e le libertà fondamentali dell'interessato che richiedono la protezione dei dati personali.</li>
-                                <li class="mb-2"><strong>3.4 Consenso:</strong> L'interessato ha espresso il consenso al trattamento dei propri dati personali per una o più specifiche finalità. Il consenso deve essere libero, specifico, informato e inequivocabile. L'interessato ha il diritto di revocare il proprio consenso in qualsiasi momento.</li>
-                            </ul>
-                            <p class="text-danger">Specificare qui le basi giuridiche su cui si fonda ciascuna delle finalità del trattamento indicate nella sezione 2.</p>
-                        </section>
+                    <h6 class="mt-4">2. A chi si rivolge questa informativa</h6>
+                    <p>
+                        Ai soci di CER Hub e ai membri delle Comunit&agrave; Energetiche Rinnovabili (CER) gestite dall'associazione
+                        che usano l'area soci <strong>app.cerhub.it</strong>, e alle persone i cui dati vengono inseriti nella piattaforma
+                        dall'associazione per gestire l'adesione (ad esempio l'intestatario di un punto di prelievo o di un impianto).
+                    </p>
 
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">4. Periodo di Conservazione dei Dati</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere compilata dall'utilizzatore del software in base ai periodi di conservazione previsti dalla legge o in base a criteri oggettivi e giustificati]
-                            </p>
-                            <p>I dati personali saranno conservati per il periodo di tempo strettamente necessario al conseguimento delle finalità per cui sono stati raccolti e, in ogni caso, nel rispetto dei termini di conservazione previsti dalla normativa applicabile.</p>
-                            <p class="text-danger">Specificare qui i periodi di conservazione per ciascuna tipologia di dati trattati o i criteri utilizzati per determinare tali periodi (ad esempio, durata dell'account, durata della partecipazione alla comunità energetica, obblighi di legge).</p>
-                        </section>
+                    <h6 class="mt-4">3. Quali dati trattiamo</h6>
+                    <ul>
+                        <li><strong>Dati dell'account:</strong> nome, cognome, nome utente, indirizzo email, password (conservata in forma cifrata e non leggibile).</li>
+                        <li><strong>Dati anagrafici e fiscali:</strong> codice fiscale, indirizzo, telefono; per imprese ed enti anche denominazione, partita IVA, PEC, codice SDI e dati di registrazione.</li>
+                        <li><strong>Dati dei punti di connessione e degli impianti:</strong> codice POD, indirizzo e posizione, tipologia (consumatore, produttore, entrambi), potenza, tensione, date di installazione e attivazione, codici e dati dell'attestato Gaud&igrave;.</li>
+                        <li><strong>Dati di energia:</strong> misure di produzione, consumo e immissione, anche con cadenza ravvicinata se sull'impianto &egrave; installato un misuratore collegato alla piattaforma, e i dati di energia condivisa e degli incentivi comunicati dal GSE.</li>
+                        <li><strong>Dati dell'adesione:</strong> comunit&agrave; di appartenenza, ruolo, tessera e numero di iscrizione nel registro soci, quota associativa e relativo pagamento, ripartizione dei benefici economici.</li>
+                        <li><strong>Documenti caricati:</strong> ad esempio attestato Gaud&igrave;, dichiarazioni di conformit&agrave;, pratiche GSE, fotografie dell'impianto.</li>
+                        <li><strong>Dati tecnici di accesso:</strong> data e ora degli accessi riusciti e falliti, indirizzo IP e tipo di browser, registrati per ragioni di sicurezza.</li>
+                        <li><strong>Cookie:</strong> vedi la <a href="{% url 'users:cookie_policy' %}">cookie policy</a>.</li>
+                    </ul>
+                    <p>I dati sono forniti da te al momento dell'adesione o dell'uso della piattaforma, oppure sono ricevuti dal GSE, dal gestore della rete di distribuzione o dal misuratore installato presso l'impianto.</p>
 
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">5. Modalità del Trattamento</h6>
-                            <p>Il trattamento dei dati personali avviene mediante strumenti manuali, informatici e telematici, con logiche strettamente correlate alle finalità indicate e, comunque, in modo da garantire la sicurezza e la riservatezza dei dati stessi. Adottiamo adeguate misure di sicurezza tecniche e organizzative per proteggere i dati da accessi non autorizzati, perdite, distruzioni o alterazioni.</p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">6. Destinatari dei Dati Personali</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere modificata dall'utilizzatore del software in base ai soggetti con cui vengono condivisi i dati]
-                            </p>
-                            <p>I dati personali potranno essere comunicati, nei limiti strettamente pertinenti alle finalità indicate, alle seguenti categorie di soggetti:</p>
-                            <ul class="list-unstyled ps-3">
-                                <li class="mb-2"><strong>Dipendenti e collaboratori:</strong> Autorizzati al trattamento in qualità di incaricati, nell'ambito delle rispettive mansioni e in conformità alle istruzioni ricevute.</li>
-                                <li class="mb-2"><strong>Fornitori di servizi:</strong> Società terze che forniscono servizi, come ad esempio hosting, manutenzione del software, gestione dei pagamenti, analisi dei dati, invio di email. Questi soggetti agiscono in qualità di Responsabili del trattamento, sulla base di specifici accordi contrattuali che garantiscono il rispetto della normativa sulla protezione dei dati.</li>
-                                <li class="mb-2"><strong>Autorità competenti:</strong> Autorità giudiziarie, amministrative o di pubblica sicurezza, nei casi previsti dalla legge o per adempiere a un ordine dell'Autorità.</li>
-                                <li class="mb-2"><strong>Altri membri della comunità energetica:</strong> Solo con il consenso degli interessati e nei limiti necessari per la gestione della comunità stessa (se applicabile).</li>
-                            </ul>
-                            <p class="text-danger">Elencare qui le categorie di soggetti a cui vengono comunicati i dati e specificare, se possibile, i nominativi dei Responsabili del trattamento.</p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">7. Trasferimento dei Dati all'Estero</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere compilata dall'utilizzatore del software, specificando se i dati vengono trasferiti al di fuori dello Spazio Economico Europeo (SEE) e, in caso affermativo, indicando le garanzie adottate per il trasferimento]
-                            </p>
-                            <p>I dati personali sono trattati principalmente all'interno dello Spazio Economico Europeo (SEE). Tuttavia, alcuni fornitori di servizi potrebbero avere sede in paesi al di fuori del SEE. In questi casi, ci assicuriamo che il trasferimento dei dati avvenga nel rispetto delle garanzie previste dal GDPR, ad esempio attraverso l'adozione di Clausole Contrattuali Standard approvate dalla Commissione Europea o verificando l'adesione del fornitore a schemi di certificazione riconosciuti.</p>
-                            <p class="text-danger">Specificare se i dati vengono trasferiti extra-SEE e, in caso affermativo, indicare i paesi di destinazione e le garanzie adottate (Clausole Contrattuali Standard, decisioni di adeguatezza, ecc.).</p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">8. I Diritti degli Interessati</h6>
-                            <p>In qualità di interessato, hai il diritto di esercitare i seguenti diritti previsti dal GDPR:</p>
-                            <ul class="list-unstyled ps-3">
-                                <li class="mb-2"><strong>8.1 Diritto di accesso (art. 15 GDPR):</strong> Hai il diritto di ottenere la conferma che sia o meno in corso un trattamento di dati personali che ti riguardano e, in tal caso, di ottenere l'accesso ai dati personali e alle informazioni relative al trattamento.</li>
-                                <li class="mb-2"><strong>8.2 Diritto di rettifica (art. 16 GDPR):</strong> Hai il diritto di ottenere la rettifica dei dati personali inesatti che ti riguardano e di ottenere l'integrazione dei dati personali incompleti.</li>
-                                <li class="mb-2"><strong>8.3 Diritto alla cancellazione ("diritto all'oblio") (art. 17 GDPR):</strong> Hai il diritto di ottenere la cancellazione dei dati personali che ti riguardano, nei casi previsti dal GDPR (ad esempio, se i dati non sono più necessari rispetto alle finalità per cui sono stati raccolti, se revochi il consenso, se i dati sono stati trattati illecitamente).</li>
-                                <li class="mb-2"><strong>8.4 Diritto di limitazione di trattamento (art. 18 GDPR):</strong> Hai il diritto di ottenere la limitazione del trattamento, ad esempio, quando contesti l'esattezza dei dati o quando il trattamento è illecito e ti opponi alla cancellazione dei dati.</li>
-                                <li class="mb-2"><strong>8.5 Diritto alla portabilità dei dati (art. 20 GDPR):</strong> Hai il diritto di ricevere in un formato strutturato, di uso comune e leggibile da dispositivo automatico i dati personali che ti riguardano e di trasmettere tali dati a un altro titolare del trattamento, se tecnicamente fattibile e se il trattamento si basa sul consenso o su un contratto.</li>
-                                <li class="mb-2"><strong>8.6 Diritto di opposizione (art. 21 GDPR):</strong> Hai il diritto di opporti in qualsiasi momento, per motivi connessi alla tua situazione particolare, al trattamento dei dati personali che ti riguardano basato sul legittimo interesse del Titolare. Hai inoltre il diritto di opporti in qualsiasi momento al trattamento dei tuoi dati per finalità di marketing diretto.</li>
-                                <li class="mb-2"><strong>8.7 Diritto di non essere sottoposto a una decisione basata unicamente sul trattamento automatizzato, compresa la profilazione (art. 22 GDPR):</strong> Hai il diritto di non essere sottoposto a una decisione basata unicamente sul trattamento automatizzato, compresa la profilazione, che produca effetti giuridici che ti riguardano o che incida in modo analogo significativamente sulla tua persona, salvo nei casi previsti dal GDPR.</li>
-                            </ul>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">9. Modalità di Esercizio dei Diritti</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere compilata dall'utilizzatore del software, indicando le modalità con cui gli interessati possono esercitare i loro diritti]
-                            </p>
-                            <p>Per esercitare i tuoi diritti, puoi inviare una richiesta scritta a <span class="text-danger">[Inserire indirizzo email o indirizzo postale del Titolare del trattamento]</span>.</p>
-                            <p>Per poter gestire correttamente la tua richiesta, ti chiediamo di fornire informazioni sufficienti per identificarti e di specificare chiaramente il diritto che intendi esercitare. Ti risponderemo entro un mese dalla ricezione della tua richiesta, salvo proroghe giustificate da particolari complessità, di cui ti informeremo tempestivamente.</p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">10. Reclamo all'Autorità di Controllo</h6>
-                            <p>Se ritieni che il trattamento dei tuoi dati personali violi il GDPR, hai il diritto di proporre reclamo a un'autorità di controllo, segnatamente nello Stato membro in cui risiedi abitualmente, lavori oppure del luogo ove si è verificata la presunta violazione. In Italia, l'autorità di controllo è il Garante per la Protezione dei Dati Personali (www.garanteprivacy.it).</p>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere adattata in base al paese in cui opera il Titolare del trattamento, indicando l'autorità di controllo competente]
-                            </p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">11. Modifiche alla Presente Informativa</h6>
-                            <p class="text-danger small">
-                                [Questa sezione deve essere compilata dall'utilizzatore del software]
-                            </p>
-                            <p>Il Titolare del trattamento si riserva il diritto di modificare la presente Informativa sulla Privacy in qualsiasi momento. Gli utenti saranno informati di eventuali modifiche sostanziali <span class="text-danger">[Specificare le modalità con cui verranno comunicate le modifiche, ad esempio: pubblicando la versione aggiornata sul sito web, inviando una notifica agli utenti, ecc.]</span>. Si invita a consultare regolarmente questa pagina per rimanere aggiornato sulle pratiche in materia di privacy.</p>
-                        </section>
-
-                        <section class="mb-4">
-                            <h6 class="fw-bold mb-3">Disclaimer</h6>
-                            <p>Questo modello di informativa sulla privacy ha uno scopo puramente informativo e non costituisce una consulenza legale. Gli sviluppatori di CerCollettiva non si assumono alcuna responsabilità per l'utilizzo di questo modello da parte di terzi. Ciascun utilizzatore del software è responsabile del trattamento dei dati personali effettuato tramite il software stesso e deve adottare tutte le misure necessarie per garantire la conformità alla normativa applicabile.</p>
-                        </section>
-
-                        <div class="text-end mt-4">
-                            <a href="{% url 'users:register' %}" class="btn btn-cer-primary">
-                                <i class="fas fa-arrow-left me-2"></i>Torna alla Registrazione
-                            </a>
-                        </div>
+                    <h6 class="mt-4">4. Perch&eacute; li trattiamo e su quale base</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr><th>Finalit&agrave;</th><th>Base giuridica</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Gestire l'adesione all'associazione e alla CER, l'account e i servizi dell'area soci</td>
+                                    <td>Esecuzione del rapporto associativo e delle misure richieste prima dell'adesione (art. 6.1.b GDPR)</td>
+                                </tr>
+                                <tr>
+                                    <td>Costituire e gestire la configurazione presso il GSE, calcolare e ripartire incentivi e contributi</td>
+                                    <td>Esecuzione del rapporto associativo (art. 6.1.b) e obblighi di legge previsti dalla normativa sulle CER (art. 6.1.c)</td>
+                                </tr>
+                                <tr>
+                                    <td>Adempimenti amministrativi, contabili e fiscali</td>
+                                    <td>Obbligo di legge (art. 6.1.c)</td>
+                                </tr>
+                                <tr>
+                                    <td>Sicurezza della piattaforma, prevenzione di accessi non autorizzati, tutela dei diritti dell'associazione</td>
+                                    <td>Legittimo interesse del titolare (art. 6.1.f)</td>
+                                </tr>
+                                <tr>
+                                    <td>Comunicazioni di servizio relative alla CER e alla piattaforma</td>
+                                    <td>Esecuzione del rapporto associativo (art. 6.1.b)</td>
+                                </tr>
+                                <tr>
+                                    <td>Statistiche anonime sull'uso della piattaforma con Google Analytics</td>
+                                    <td>Consenso, che puoi dare e revocare dal banner o da &ldquo;Preferenze cookie&rdquo; (art. 6.1.a)</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                    <p>Non usiamo i tuoi dati per marketing di terzi n&eacute; per decisioni basate unicamente su trattamenti automatizzati, compresa la profilazione.</p>
+
+                    <h6 class="mt-4">5. Sei obbligato a fornire i dati?</h6>
+                    <p>
+                        I dati anagrafici, quelli del punto di connessione e dell'impianto sono necessari per aderire alla CER e per ottenere i benefici previsti:
+                        senza di essi non possiamo gestire la tua partecipazione. Il consenso ai cookie statistici &egrave; sempre facoltativo.
+                    </p>
+
+                    <h6 class="mt-4">6. Come li trattiamo e dove sono conservati</h6>
+                    <p>
+                        I dati sono trattati con strumenti informatici, da persone autorizzate dall'associazione, con misure di sicurezza adeguate
+                        (connessioni cifrate, accessi con credenziali personali, copie di sicurezza). La piattaforma &egrave; ospitata su server situati in Italia.
+                    </p>
+
+                    <h6 class="mt-4">7. A chi possono essere comunicati</h6>
+                    <ul>
+                        <li><strong>GSE &ndash; Gestore dei Servizi Energetici</strong>, gestore della rete di distribuzione e altri soggetti pubblici, quando &egrave; previsto dalla normativa sulle CER.</li>
+                        <li><strong>Amministratori e referenti della tua CER</strong>, per la gestione della comunit&agrave;.</li>
+                        <li><strong>Fornitori di servizi tecnici</strong> (hosting, manutenzione della piattaforma, posta elettronica), che operano come responsabili del trattamento in base a un accordo scritto.</li>
+                        <li><strong>Consulenti</strong> dell'associazione (fiscali, legali), nei limiti del loro incarico, e autorit&agrave; quando richiesto dalla legge.</li>
+                        <li><strong>Google Ireland Limited</strong>, solo se acconsenti ai cookie statistici.</li>
+                    </ul>
+                    <p>I dati non sono diffusi.</p>
+
+                    <h6 class="mt-4">8. Trasferimenti fuori dall'Unione Europea</h6>
+                    <p>
+                        I dati della piattaforma restano in Italia. Se acconsenti ai cookie statistici, Google pu&ograve; trattare i dati di navigazione anche negli Stati Uniti,
+                        sulla base della decisione di adeguatezza della Commissione Europea (EU-U.S. Data Privacy Framework) e delle clausole contrattuali standard.
+                    </p>
+
+                    <h6 class="mt-4">9. Per quanto tempo li conserviamo</h6>
+                    <ul>
+                        <li>Dati dell'account e dell'adesione: per tutta la durata del rapporto associativo.</li>
+                        <li>Dati e documenti con rilevanza amministrativa, contabile o relativi agli incentivi: per 10 anni dalla fine del rapporto o dall'ultima erogazione, salvo termini pi&ugrave; lunghi previsti dalla legge o necessari in caso di contenzioso.</li>
+                        <li>Misure di energia: per la durata del periodo di incentivazione e per i successivi 10 anni.</li>
+                        <li>Registri degli accessi: 12 mesi.</li>
+                        <li>Dati statistici di Google Analytics: al massimo 14 mesi.</li>
+                    </ul>
+
+                    <h6 class="mt-4">10. I tuoi diritti</h6>
+                    <p>
+                        Puoi chiedere in ogni momento l'accesso ai tuoi dati, la rettifica, la cancellazione, la limitazione del trattamento, la portabilit&agrave;,
+                        e puoi opporti ai trattamenti basati sul legittimo interesse (articoli 15-22 GDPR). Puoi revocare il consenso ai cookie statistici
+                        senza che questo incida sui trattamenti gi&agrave; effettuati. Dal tuo profilo puoi aggiornare i dati e chiedere l'eliminazione dell'account.
+                    </p>
+                    <p>
+                        Per esercitare i diritti scrivi a <a href="mailto:info@cerhub.it">info@cerhub.it</a>. Rispondiamo entro un mese.
+                        Se ritieni che il trattamento violi la normativa puoi proporre reclamo al
+                        <a href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante per la protezione dei dati personali</a>.
+                    </p>
+
+                    <h6 class="mt-4">11. Modifiche a questa informativa</h6>
+                    <p class="mb-0">
+                        Possiamo aggiornare questa informativa, ad esempio se cambiano la normativa o le funzioni della piattaforma.
+                        La versione in vigore &egrave; sempre pubblicata in questa pagina, con la data di ultimo aggiornamento; in caso di modifiche rilevanti avvisiamo i soci.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-{% block extra_css %}
-<style>
-    .cer-card {
-        transition: transform 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .cer-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .privacy-content h6 {
-        color: #2c3e50;
-    }
-
-    .privacy-content ul li {
-        color: #4a5568;
-        line-height: 1.6;
-    }
-
-    .privacy-content p {
-        color: #4a5568;
-        line-height: 1.6;
-    }
-</style>
-{% endblock %}
 {% endblock %}
