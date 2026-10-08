@@ -162,6 +162,8 @@
                        <dt>Ultimo Aggiornamento:</dt>
                        <dd>{{ user.privacy_last_update|date:"d/m/Y"|default:"-" }}</dd>
                    </dl>
+                   <hr>
+                   <a href="{% url 'users:delete_account' %}" class="small text-danger">Richiedi l'eliminazione dell'account</a>
                </div>
            </div>
 

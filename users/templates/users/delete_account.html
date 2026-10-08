@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="cer-card">
+                <div class="cer-card-header">
+                    <h2 class="mb-0">Richiesta di eliminazione dell'account</h2>
+                </div>
+                <div class="card-body">
+                    {% if gia_richiesta %}
+                    <div class="alert alert-info" role="alert">
+                        Hai gi&agrave; inviato la richiesta: ti risponderemo al pi&ugrave; presto.
+                    </div>
+                    <a href="{% url 'users:profile' %}" class="btn btn-cer-outline-primary">Torna al profilo</a>
+                    {% else %}
+                    <p>
+                        Da questa pagina puoi chiedere all'associazione di eliminare il tuo account
+                        <strong>{{ request.user.username }}</strong>.
+                    </p>
+                    <ul>
+                        <li>La richiesta viene inviata a <a href="mailto:{{ email_associazione }}">{{ email_associazione }}</a>{% if request.user.email %}, con una copia a {{ request.user.email }}{% endif %}.</li>
+                        <li>L'account non viene eliminato subito: resta attivo finch&eacute; l'associazione non ti risponde.</li>
+                        <li>Alcuni dati (per esempio il libro soci e le domande di adesione firmate) possono dover essere conservati per obblighi di legge, come indicato nell'<a href="{% url 'users:privacy_policy' %}">informativa sulla privacy</a>.</li>
+                        <li>L'eliminazione dell'account non equivale al recesso dalla comunit&agrave; energetica: se vuoi anche recedere, scrivilo all'associazione.</li>
+                    </ul>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button type="submit" class="btn btn-danger">Invia la richiesta</button>
+                            <a href="{% url 'users:profile' %}" class="btn btn-cer-outline-primary">Annulla</a>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,8 +5,11 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib import messages
+from django.conf import settings
+from django.core.cache import cache
+from django.core.mail import EmailMessage
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 from django.db.models import Q
@@ -211,19 +214,75 @@ class CustomPasswordChangeView(LoginRequiredMixin, PasswordChangeView):
         return super().form_valid(form)
 
 class DeleteAccountView(LoginRequiredMixin, View):
-    """Vista per l'eliminazione dell'account"""
+    """Richiesta di eliminazione dell'account.
+
+    L'account non viene cancellato da questa pagina: la richiesta arriva per
+    email all'associazione, che la evade dal pannello di amministrazione dopo
+    aver verificato gli obblighi di conservazione (libro soci, domande di
+    adesione firmate, impianti e documenti collegati).
+    """
     template_name = 'users/delete_account.html'
+    # Una sola richiesta al giorno per utente
+    REQUEST_INTERVAL = 24 * 60 * 60
+
+    def _context(self, request):
+        return {
+            'email_associazione': settings.ADESIONI_EMAIL_ASSOCIAZIONE,
+            'gia_richiesta': bool(cache.get(self._cache_key(request.user))),
+        }
+
+    @staticmethod
+    def _cache_key(user):
+        return f'richiesta_eliminazione_account_{user.pk}'
 
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, self._context(request))
 
     def post(self, request):
-        # Log dell'eliminazione account per GDPR
-        user_id = request.user.id
-        request.user.delete()
-        messages.success(request, 'Account eliminato con successo.')
-        # Qui potresti aggiungere la logica per conservare i dati necessari per GDPR
-        return redirect('core:home')
+        user = request.user
+        associazione = settings.ADESIONI_EMAIL_ASSOCIAZIONE
+
+        if cache.get(self._cache_key(user)):
+            messages.info(request, 'La tua richiesta è già stata inviata: ti risponderemo al più presto.')
+            return redirect('users:profile')
+
+        nome = user.get_full_name() or user.legal_name or user.username
+        scheda = request.build_absolute_uri(
+            reverse('admin:users_customuser_change', args=[user.pk])
+        )
+        testo = (
+            "Un utente dell'area soci chiede l'eliminazione del proprio account.\n\n"
+            f"Utente: {user.username}\n"
+            f"Nome: {nome}\n"
+            f"Email: {user.email or 'non indicata'}\n"
+            f"Richiesta del: {timezone.localtime().strftime('%d/%m/%Y %H:%M')}\n\n"
+            f"Scheda dell'utente: {scheda}\n\n"
+            "L'account non è stato modificato: l'eliminazione va fatta dal pannello di "
+            "amministrazione dopo aver verificato i dati che l'associazione deve conservare."
+        )
+        try:
+            EmailMessage(
+                subject=f"Richiesta di eliminazione account: {user.username}",
+                body=testo,
+                to=[associazione],
+                cc=[user.email] if user.email else [],
+                reply_to=[user.email] if user.email else None,
+            ).send()
+        except Exception:
+            logger.exception("Invio della richiesta di eliminazione account non riuscito (utente %s)", user.pk)
+            messages.error(
+                request,
+                f'Non è stato possibile inviare la richiesta. Scrivi a {associazione}.'
+            )
+            return redirect('users:delete_account')
+
+        cache.set(self._cache_key(user), True, self.REQUEST_INTERVAL)
+        logger.info("Richiesta di eliminazione account inviata (utente %s)", user.pk)
+        messages.success(
+            request,
+            'Richiesta inviata. Riceverai una risposta dall\'associazione; nel frattempo il tuo account resta attivo.'
+        )
+        return redirect('users:profile')
 
 class UserManagementView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CustomUser

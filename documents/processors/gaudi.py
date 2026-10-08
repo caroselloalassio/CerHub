@@ -4,7 +4,7 @@ import logging
 import re
 from typing import Optional, Dict, Any
 from django.utils.translation import gettext as _
-import PyPDF2
+import pypdf
 from io import BytesIO
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class GaudiProcessor:
             
             try:
                 # Estrai il testo dal PDF
-                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                pdf_reader = pypdf.PdfReader(pdf_file)
                 text_content = []
                 for page in pdf_reader.pages:
                     text_content.append(page.extract_text())
@@ -332,7 +332,7 @@ class GaudiProcessor:
             
             try:
                 # Estrai il testo dal PDF
-                pdf_reader = PyPDF2.PdfReader(pdf_file)
+                pdf_reader = pypdf.PdfReader(pdf_file)
                 text_content = []
                 for page in pdf_reader.pages:
                     text_content.append(page.extract_text())

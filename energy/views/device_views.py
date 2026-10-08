@@ -45,10 +45,10 @@ class DeviceListView(LoginRequiredMixin, ListView):
             return redirect('energy:devices')
 
     def get_queryset(self):
-        # Get devices for current user with plant data
-        queryset = DeviceConfiguration.objects.filter(
-            plant__owner=self.request.user
-        ).select_related('plant')
+        # Dispositivi dell'utente; lo staff vede quelli di tutti (sola consultazione)
+        queryset = DeviceConfiguration.objects.select_related('plant')
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(plant__owner=self.request.user)
 
         # Update online status for each device
         for device in queryset:
@@ -250,9 +250,20 @@ class DeviceDetailView(LoginRequiredMixin, UpdateView):
         return form
 
     def get_queryset(self):
-        return DeviceConfiguration.objects.filter(
-            plant__owner=self.request.user
-        ).select_related('plant')
+        # Lo staff puo' aprire il dettaglio dei dispositivi di tutti
+        queryset = DeviceConfiguration.objects.select_related('plant')
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(plant__owner=self.request.user)
+        return queryset
+
+    def post(self, request, *args, **kwargs):
+        # La modifica resta riservata al proprietario dell'impianto: lo staff
+        # consulta soltanto (le modifiche si fanno dal pannello di amministrazione)
+        device = self.get_object()
+        if device.plant.owner_id != request.user.pk:
+            messages.error(request, 'Solo il proprietario dell\'impianto può modificare il dispositivo da questa pagina')
+            return redirect('energy:device-detail', pk=device.pk)
+        return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -335,11 +346,11 @@ class MeasurementListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        return DeviceMeasurement.objects.select_related(
-            'device', 'plant'
-        ).filter(
-            plant__owner=self.request.user
-        ).order_by('-timestamp')
+        # Misure dell'utente; lo staff vede quelle di tutti
+        queryset = DeviceMeasurement.objects.select_related('device', 'plant')
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(plant__owner=self.request.user)
+        return queryset.order_by('-timestamp')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -353,9 +364,10 @@ class MeasurementDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'measurement'
 
     def get_queryset(self):
-        return super().get_queryset().select_related(
-            'device', 'plant'
-        ).filter(plant__owner=self.request.user)
+        queryset = super().get_queryset().select_related('device', 'plant')
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(plant__owner=self.request.user)
+        return queryset
 
 @login_required
 def device_delete(request, pk):
