@@ -223,7 +223,9 @@ class PlantUpdateView(UpdateView, BasePlantView):
     def setup(self, request, *args, **kwargs):
         """Inizializza l'oggetto all'avvio della vista"""
         super().setup(request, *args, **kwargs)
-        self.object = self.get_object()
+        # Utente non autenticato: ci pensa il controllo di accesso a mandarlo al login
+        if request.user.is_authenticated:
+            self.object = self.get_object()
     
     def get_queryset(self):
         """Definisce il queryset base per il recupero dell'oggetto"""

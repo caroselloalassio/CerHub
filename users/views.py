@@ -223,7 +223,7 @@ class DeleteAccountView(LoginRequiredMixin, View):
         request.user.delete()
         messages.success(request, 'Account eliminato con successo.')
         # Qui potresti aggiungere la logica per conservare i dati necessari per GDPR
-        return redirect('home')
+        return redirect('core:home')
 
 class UserManagementView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = CustomUser

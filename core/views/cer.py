@@ -96,6 +96,11 @@ class CERDetailView(BaseCERView):
     
     def dispatch(self, request, *args, **kwargs):
         """Check if user is member, otherwise redirect to public view"""
+        # Utente non autenticato: al login (altrimenti il filtro sotto va in errore)
+        if not request.user.is_authenticated:
+            from django.contrib.auth.views import redirect_to_login
+            return redirect_to_login(request.get_full_path())
+
         cer = get_object_or_404(CERConfiguration, pk=kwargs['pk'])
         
         if not request.user.is_staff:

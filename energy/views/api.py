@@ -47,7 +47,7 @@ class DeviceConfigurationViewSet(viewsets.ModelViewSet):
         return super().get_queryset().filter(plant__owner=self.request.user)
 
     @action(detail=True)
-    def latest_measurement(self, request, pk=None):
+    def latest_measurement(self, request, pk=None, format=None):
         device = self.get_object()
         try:
             measurement = DeviceMeasurement.objects.filter(
@@ -89,7 +89,7 @@ class DeviceMeasurementViewSet(DeviceOnlineCheckMixin, CachedRetrieveMixin,
         return base_queryset.filter(plant__owner=self.request.user)
 
     @action(detail=False)
-    def latest(self, request):
+    def latest(self, request, format=None):
         device_id = request.query_params.get('device_id')
         if device_id:
             try:
@@ -140,7 +140,7 @@ class PlantViewSet(viewsets.ModelViewSet):
             return base_queryset
         return base_queryset.filter(owner=self.request.user)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, format=None):
         """
         Override del retrieve per includere il tipo di impianto nella risposta
         """
@@ -150,7 +150,7 @@ class PlantViewSet(viewsets.ModelViewSet):
         return Response(data)
 
     @action(detail=True, methods=['get'])
-    def type(self, request, pk=None):
+    def type(self, request, pk=None, format=None):
         """
         Endpoint dedicato per ottenere il tipo di impianto
         """
@@ -162,7 +162,7 @@ class PlantViewSet(viewsets.ModelViewSet):
         })
 
     @action(detail=True, methods=['get'])
-    def statistics(self, request, pk=None):
+    def statistics(self, request, pk=None, format=None):
         """
         Fornisce statistiche dettagliate per un singolo impianto.
         Include:
@@ -229,7 +229,7 @@ class PlantViewSet(viewsets.ModelViewSet):
             )
 
     @action(detail=True, methods=['get'])
-    def device_status(self, request, pk=None):
+    def device_status(self, request, pk=None, format=None):
         """
         Fornisce lo stato dettagliato di tutti i dispositivi dell'impianto
         """
@@ -246,7 +246,7 @@ class PlantViewSet(viewsets.ModelViewSet):
                     
                     device_statuses.append({
                         'device_id': device.id,
-                        'name': device.name,
+                        'name': device.device_id,
                         'is_online': latest.timestamp > timezone.now() - timedelta(minutes=5),
                         'last_seen': latest.timestamp,
                         'current_power': latest.power,
@@ -255,7 +255,7 @@ class PlantViewSet(viewsets.ModelViewSet):
                 except DeviceMeasurement.DoesNotExist:
                     device_statuses.append({
                         'device_id': device.id,
-                        'name': device.name,
+                        'name': device.device_id,
                         'is_online': False,
                         'last_seen': None,
                         'current_power': 0,
