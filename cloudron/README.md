@@ -31,8 +31,10 @@ attivo.
 
 L'app `adesioni` pubblica la domanda di adesione su `/adesione/` (privati e ditte
 individuali, aziende e associazioni). Alla conferma genera il PDF della domanda e
-lo manda in firma a Documenso, l'istanza dell'associazione su `firme.cerhub.it`
-(app Cloudron, versione gratuita), tramite le API v2. Dopo la firma scarica il
+lo manda in firma a Documenso su `firme.carosello.cloud` (app Cloudron, versione
+gratuita; istanza condivisa fra più organizzazioni: CER Hub è una di queste, con
+il team `cerhub`), tramite le API v2. Il vecchio indirizzo `firme.cerhub.it`
+reindirizza al nuovo. L'indirizzo usato dall'app è la variabile `DOCUMENSO_URL`. Dopo la firma scarica il
 documento firmato, crea l'utente dell'aderente e avvisa per email l'aderente e
 l'associazione. Le domande si esaminano da `/ceradmin/adesioni/adesione/`.
 
@@ -47,7 +49,8 @@ l'associazione. Le domande si esaminano da `/ceradmin/adesioni/adesione/`.
 Il dominio `cerhub.it` esce da un relay autenticato come `noreply@cerhub.it`:
 il mittente dell'app in Cloudron (app → Email) deve restare `noreply@cerhub.it`,
 altrimenti il server di posta rifiuta i messaggi ("Mittente non consentito").
-Lo stesso vale per `firme.cerhub.it`.
+Lo stesso vale per Documenso (`firme.carosello.cloud`), che per ora spedisce
+come `noreply@cerhub.it`.
 
 ## Aggiornamenti
 

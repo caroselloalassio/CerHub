@@ -310,6 +310,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
 # Adesioni online: firma elettronica con Documenso (istanza dell'associazione).
 # Senza token l'adesione online resta disattivata.
-DOCUMENSO_URL = os.getenv('DOCUMENSO_URL', 'https://firme.cerhub.it')
+DOCUMENSO_URL = os.getenv('DOCUMENSO_URL', 'https://firme.carosello.cloud')
 DOCUMENSO_API_TOKEN = os.getenv('DOCUMENSO_API_TOKEN', '')
 ADESIONI_EMAIL_ASSOCIAZIONE = os.getenv('ADESIONI_EMAIL_ASSOCIAZIONE', 'info@cerhub.it')

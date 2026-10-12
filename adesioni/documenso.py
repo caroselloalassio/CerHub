@@ -1,4 +1,4 @@
-"""Client minimale per le API v2 di Documenso (firma elettronica su firme.cerhub.it)."""
+"""Client minimale per le API v2 di Documenso (firma elettronica su firme.carosello.cloud)."""
 import json
 import logging
 

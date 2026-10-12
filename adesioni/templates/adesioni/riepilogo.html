@@ -31,7 +31,7 @@
     {% csrf_token %}
     <button type="submit" class="btn btn-cer-primary btn-lg"><i class="fas fa-signature me-2" aria-hidden="true"></i>{% if adesione.stato == 'IN_FIRMA' %}Riprendi la firma{% else %}Firma la domanda{% endif %}</button>
   </form>
-  <p class="form-text mt-2">Verrai portato sul servizio di firma di CER Hub (firme.cerhub.it) e poi di nuovo qui. Ti abbiamo anche inviato per e-mail il link per riprendere in un secondo momento.</p>
+  <p class="form-text mt-2">Verrai portato sul servizio di firma elettronica usato da CER Hub (firme.carosello.cloud) e poi di nuovo qui. Ti abbiamo anche inviato per e-mail il link per riprendere in un secondo momento.</p>
   {% else %}
   <div class="alert alert-warning alert-permanent" role="alert">La firma online non è al momento disponibile. I tuoi dati sono salvati: riprova più tardi dal link che ti abbiamo inviato per e-mail.</div>
   {% endif %}

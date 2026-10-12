@@ -34,7 +34,7 @@ if [[ ! -f "$DATA/env.sh" ]]; then
 # export MQTT_PASS=
 # export MQTT_TLS=False
 #
-# Firma elettronica delle adesioni online (Documenso su firme.cerhub.it):
+# Firma elettronica delle adesioni online (Documenso su firme.carosello.cloud):
 # export DOCUMENSO_API_TOKEN=
 EOF
 fi
