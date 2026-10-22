@@ -1,6 +1,6 @@
 # core/views/api/mqtt.py
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -45,6 +45,8 @@ def mqtt_status_api(request, plant_id):
             } if device else None
         })
         
+    except Http404:
+        raise
     except Exception as e:
         logger.error(f"Error in mqtt_status_api: {str(e)}", exc_info=True)
         return JsonResponse(

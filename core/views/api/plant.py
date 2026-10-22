@@ -1,6 +1,6 @@
 # core/views/api/plant.py
 
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -104,6 +104,8 @@ def get_plant_data(request, pk):
         logger.info(f"Returning data for plant {pk}: {len(data)} measurements")
         return JsonResponse(response_data)
         
+    except Http404:
+        raise
     except Exception as e:
         logger.error(f"Error in get_plant_data: {str(e)}", exc_info=True)
         return JsonResponse({
@@ -168,6 +170,8 @@ def plant_measurements_api(request, plant_id):
             }
         })
         
+    except Http404:
+        raise
     except Exception as e:
         logger.error(f"Error in plant_measurements_api: {str(e)}", exc_info=True)
         return JsonResponse({

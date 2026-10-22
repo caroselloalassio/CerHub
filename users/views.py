@@ -133,7 +133,7 @@ class ProfileView(LoginRequiredMixin, View):
         # Statistiche utente
         context.update({
             'total_logins': request.user.logins.count() if hasattr(request.user, 'logins') else 0,
-            'total_documents': request.user.documents.count() if hasattr(request.user, 'documents') else 0,
+            'total_documents': request.user.uploaded_documents.count(),
             'total_plants': request.user.plants.count() if hasattr(request.user, 'plants') else 0,
         })
         
@@ -142,7 +142,7 @@ class ProfileView(LoginRequiredMixin, View):
             'privacy_status': {
                 'accepted': getattr(request.user, 'privacy_accepted', False),
                 'acceptance_date': getattr(request.user, 'privacy_acceptance_date', None),
-                'last_update': getattr(request.user, 'last_privacy_update', None),
+                'last_update': getattr(request.user, 'privacy_last_update', None),
             }
         })
 
@@ -193,7 +193,7 @@ class ProfileView(LoginRequiredMixin, View):
             'privacy_status': {
                 'accepted': getattr(request.user, 'privacy_accepted', False),
                 'acceptance_date': getattr(request.user, 'privacy_acceptance_date', None),
-                'last_update': getattr(request.user, 'last_privacy_update', None),
+                'last_update': getattr(request.user, 'privacy_last_update', None),
             },
         }
         

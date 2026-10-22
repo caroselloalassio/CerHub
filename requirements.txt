@@ -16,7 +16,7 @@ geopy==2.5.0
 gunicorn==26.2.0
 paho-mqtt>=2.0.0
 python-dotenv==1.2.4
-pypdf==6.19.0
+pypdf==6.21.2
 psycopg2-binary==2.9.9
 requests==2.34.2
 whitenoise==6.6.0

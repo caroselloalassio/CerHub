@@ -9,7 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.utils import timezone
 from datetime import timedelta
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 
 from core.models import Plant
@@ -420,7 +420,7 @@ def device_delete(request, pk):
 
             return JsonResponse({'success': True})
             
-        except DeviceConfiguration.DoesNotExist:
+        except (DeviceConfiguration.DoesNotExist, Http404):
             logger.warning(f"Tentativo di eliminare un dispositivo inesistente (ID: {pk}) da parte dell'utente {request.user}")
             return JsonResponse({
                 'success': False,
