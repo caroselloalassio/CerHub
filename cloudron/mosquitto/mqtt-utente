@@ -1,0 +1,37 @@
+#!/bin/bash
+# Gestione degli utenti del broker MQTT CerHub.
+#   mqtt-utente aggiungi <nome> [password]   crea o cambia la password (se non la
+#                                            dai ne genera una e la stampa)
+#   mqtt-utente rimuovi <nome>
+#   mqtt-utente elenco
+# Le modifiche valgono subito (il broker rilegge utenti e permessi).
+set -eu
+PASSWD=/app/data/passwd
+
+ricarica() { pkill -HUP -x mosquitto 2>/dev/null || true; }
+
+case "${1:-}" in
+    aggiungi)
+        nome="${2:?indica il nome utente}"
+        [[ "$nome" =~ ^[A-Za-z0-9._-]+$ ]] || { echo "nome non valido: usa lettere, numeri, . _ -"; exit 1; }
+        pw="${3:-$(head -c 32 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 24)}"
+        mosquitto_passwd -b "$PASSWD" "$nome" "$pw"
+        chown cloudron:cloudron "$PASSWD"; chmod 600 "$PASSWD"
+        ricarica
+        echo "utente: $nome"
+        [ -n "${3:-}" ] || echo "password: $pw"
+        ;;
+    rimuovi)
+        nome="${2:?indica il nome utente}"
+        mosquitto_passwd -D "$PASSWD" "$nome"
+        ricarica
+        echo "rimosso: $nome"
+        ;;
+    elenco)
+        cut -d: -f1 "$PASSWD"
+        ;;
+    *)
+        sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'
+        exit 1
+        ;;
+esac

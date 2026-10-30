@@ -1,0 +1,31 @@
+{
+  "id": "it.cerhub.mqtt",
+  "title": "CerHub MQTT",
+  "author": "CER Hub",
+  "description": "Broker MQTT (Eclipse Mosquitto) che riceve le misure dei dispositivi delle comunità energetiche e le passa all'app CerHub.\n\nAccesso solo cifrato: MQTT su TLS (porta configurabile, predefinita 8883) e MQTT su WebSocket sicuro (wss://<indirizzo-app>/mqtt). Utenti e permessi si gestiscono con il comando `mqtt-utente` dal terminale dell'app.",
+  "tagline": "Broker MQTT per i misuratori della CER",
+  "version": "1.0.0",
+  "upstreamVersion": "2.0",
+  "healthCheckPath": "/",
+  "httpPort": 8080,
+  "tcpPorts": {
+    "MQTTS_PORT": {
+      "title": "MQTT su TLS",
+      "description": "Porta per i dispositivi e per l'app (MQTT cifrato con il certificato dell'indirizzo dell'app)",
+      "defaultValue": 8883,
+      "containerPort": 8883
+    }
+  },
+  "addons": {
+    "localstorage": {},
+    "tls": {}
+  },
+  "manifestVersion": 2,
+  "website": "https://github.com/caroselloalassio/CerHub/tree/main/cloudron/mosquitto",
+  "contactEmail": "info@cerhub.it",
+  "icon": "file://logo.png",
+  "tags": [ "mqtt", "iot", "energy" ],
+  "memoryLimit": 134217728,
+  "minBoxVersion": "8.0.0",
+  "postInstallMessage": "Il broker accetta solo connessioni autenticate e cifrate.\n\nPer creare un utente apri il Terminale dell'app e usa:\n  mqtt-utente aggiungi <nome>      (stampa la password generata)\n  mqtt-utente elenco\n  mqtt-utente rimuovi <nome>\n\nL'utente \"cerhub-app\" (app CerHub) può leggere tutto sotto cercollettiva/. Ogni altro utente può scrivere solo sotto cercollettiva/<proprio nome>/: per i misuratori usa come nome il POD (es. IT001E10397856) e imposta sul dispositivo il prefisso cercollettiva/<POD>/<id-dispositivo>."
+}
