@@ -1,6 +1,6 @@
 # energy/views/plant_views.py
 import logging
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -284,7 +284,7 @@ def plant_delete(request, pk):
                 'message': f'Impianto {plant_name} eliminato con successo'
             })
 
-        except Plant.DoesNotExist:
+        except (Plant.DoesNotExist, Http404):
             logger.warning(f"Tentativo di eliminare un impianto inesistente (ID: {pk}) da parte dell'utente {request.user}")
             return JsonResponse({
                 'success': False,

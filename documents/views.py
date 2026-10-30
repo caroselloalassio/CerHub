@@ -318,6 +318,8 @@ def upload_gaudi_attestation(request, plant_id):
             'message': 'Attestato caricato con successo'
         })
 
+    except Http404:
+        raise
     except Exception as e:
         logger.error(f"Errore durante l'upload: {str(e)}")
         return JsonResponse({

@@ -164,8 +164,8 @@ class CustomUser(AbstractUser):
         """
         Registra un aggiornamento della privacy
         """
-        self.last_privacy_update = timezone.now()
-        self.save(update_fields=['last_privacy_update'])
+        self.privacy_last_update = timezone.now()
+        self.save(update_fields=['privacy_last_update'])
 
     def clean(self):
         super().clean()
