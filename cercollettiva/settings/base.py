@@ -234,9 +234,9 @@ MQTT_SETTINGS = {
     'KEEPALIVE': int(os.getenv('MQTT_KEEPALIVE', 60)),
     'TLS_ENABLED': os.getenv('MQTT_TLS', 'False') == 'True',
     'CLEAN_SESSION': True,
-    'TOPIC_PREFIX': 'CerCollettiva/',
-    'STATUS_TOPIC': 'CerCollettiva/status',
-    'ERROR_TOPIC': 'CerCollettiva/errors',
+    'TOPIC_PREFIX': 'cerhub/',
+    'STATUS_TOPIC': 'cerhub/status',
+    'ERROR_TOPIC': 'cerhub/errors',
 }
 
 # Logging

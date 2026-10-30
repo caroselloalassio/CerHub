@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         geolocator = Nominatim(
-            user_agent="cercollettiva",
+            user_agent="cerhub",
             timeout=10  # Aumenta il timeout a 10 secondi
         )
         

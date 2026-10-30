@@ -129,10 +129,10 @@ MQTT_SETTINGS = {
     'RECONNECT_DELAY': 5,
     'CONNECTION_TIMEOUT': 10,
     'CLEAN_SESSION': True,
-    'TOPIC_PREFIX': 'CerCollettiva/',
-    'STATUS_TOPIC': 'CerCollettiva/status',
-    'ERROR_TOPIC': 'CerCollettiva/errors',
-    'LAST_WILL_TOPIC': 'CerCollettiva/status',
+    'TOPIC_PREFIX': 'cerhub/',
+    'STATUS_TOPIC': 'cerhub/status',
+    'ERROR_TOPIC': 'cerhub/errors',
+    'LAST_WILL_TOPIC': 'cerhub/status',
     'LAST_WILL_MESSAGE': 'offline',
 }
 

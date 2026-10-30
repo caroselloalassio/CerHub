@@ -17,10 +17,10 @@ compare tra le app, ha backup, log, terminale e riavvio come le altre.
     serve anche la pagina statica usata per il controllo di salute.
 - Niente accessi anonimi. Utenti in `/app/data/passwd`, permessi in
   `/app/data/acl` (creato al primo avvio):
-  - `cerhub-app` legge tutto sotto `cercollettiva/#`;
-  - ogni altro utente scrive solo sotto `cercollettiva/<nome utente>/#`.
+  - `cerhub-app` legge tutto sotto `cerhub/#`;
+  - ogni altro utente scrive solo sotto `cerhub/<nome utente>/#`.
     Per i misuratori si usa come nome utente il POD e come prefisso MQTT sul
-    dispositivo `cercollettiva/<POD>/<id-dispositivo>`.
+    dispositivo `cerhub/<POD>/<id-dispositivo>`.
 - Aggiunte alla configurazione: `/app/data/mosquitto-extra.conf` (poi riavviare).
 
 ## Utenti

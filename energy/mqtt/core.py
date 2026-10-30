@@ -45,7 +45,7 @@ class TopicMatcher:
         """Estrae un identificatore dal topic per la ricerca nel DB."""
         try:
             # Esempio pattern per estrarre il device_id (o una sua parte)
-            match = re.match(r'^cercollettiva/(?P<device_id_part>[-\w]+)/status/.*$', topic)
+            match = re.match(r'^cerhub/(?P<device_id_part>[-\w]+)/status/.*$', topic)
             if match:
                 return {"device_id_part": match.group('device_id_part')}
 
@@ -114,11 +114,11 @@ class MQTTService:
     def _initialize_default_handlers(self):
         """Inizializza gli handler predefiniti basati sul device registry"""
         self.register_handler(
-            "cercollettiva/+/+/status/em:0",
+            "cerhub/+/+/status/em:0",
             self._handle_power_measurement
         )
         self.register_handler(
-            "cercollettiva/+/+/status/emdata:0", 
+            "cerhub/+/+/status/emdata:0", 
             self._handle_energy_measurement
         )
 
@@ -127,7 +127,7 @@ class MQTTService:
         """Configura il client MQTT con retry"""
         try:
             with self._lock:
-                client_id = f"CerCollettiva-{timezone.now().timestamp()}"
+                client_id = f"cerhub-{timezone.now().timestamp()}"
                 self._client = mqtt.Client(client_id=client_id)
                 
                 # Callbacks
@@ -143,7 +143,7 @@ class MQTTService:
                 
                 # Imposta LWT
                 self._client.will_set(
-                    "CerCollettiva/status",
+                    "cerhub/status",
                     json.dumps({"status": "offline", "timestamp": timezone.now().isoformat()}),
                     qos=1,
                     retain=True
@@ -348,7 +348,7 @@ class MQTTService:
             }
             
             self._client.publish(
-                "CerCollettiva/status",
+                "cerhub/status",
                 json.dumps(message),
                 qos=1,
                 retain=True

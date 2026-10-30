@@ -285,7 +285,7 @@ class DeviceConfiguration(BaseTimestampModel):
                 
             except Exception as e:
                 logger.error(f"Error generating MQTT topics for device {self.device_id}: {str(e)}")
-                return ["cercollettiva/+/+/value"]  # Fallback a topic wildcard
+                return ["cerhub/+/+/value"]  # Fallback a topic wildcard
     
 
 class DeviceMeasurement(BaseMeasurementModel):

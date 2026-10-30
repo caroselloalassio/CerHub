@@ -200,7 +200,7 @@ def handle_device_created(sender, instance, created, **kwargs):
                 
             if not active_topics:
                 # Se non ci sono topic specifici, usa il wildcard
-                default_topic = "cercollettiva/+/+/value"
+                default_topic = "cerhub/+/+/value"
                 logger.info(f"Nessun topic specifico, sottoscrizione a: {default_topic}")
                 client.subscribe(default_topic)
                 
@@ -231,7 +231,7 @@ def handle_device_deleted(sender, instance, **kwargs):
                 
             if not active_topics:
                 # Se non ci sono più dispositivi attivi, torna al wildcard
-                default_topic = "cercollettiva/+/+/value"
+                default_topic = "cerhub/+/+/value"
                 logger.info(f"Nessun topic attivo, sottoscrizione a: {default_topic}")
                 client.subscribe(default_topic)
                 

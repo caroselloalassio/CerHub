@@ -799,7 +799,7 @@ class PlantMQTTConfigForm(forms.Form):
     mqtt_topic_prefix = forms.CharField(
         label=_("Prefisso Topic"),
         max_length=255,
-        initial="cercollettiva",
+        initial="cerhub",
         widget=forms.TextInput(attrs={'class': 'form-control'}),
         help_text=_("Prefisso per i topic MQTT")
     )

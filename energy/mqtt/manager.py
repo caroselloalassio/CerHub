@@ -63,11 +63,11 @@ class DeviceManager:
     def _setup_message_handlers(self):
         """Configura gli handler per i messaggi MQTT"""
         self._mqtt_service.register_handler(
-            "cercollettiva/+/+/status/em:0",
+            "cerhub/+/+/status/em:0",
              self._handle_power_message
         )
         self._mqtt_service.register_handler(
-             "cercollettiva/+/+/status/emdata:0",
+             "cerhub/+/+/status/emdata:0",
              self._handle_energy_message
         )
 

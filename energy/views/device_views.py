@@ -412,7 +412,7 @@ def device_delete(request, pk):
                             client.subscribe(topic)
                     else:
                         # Se non ci sono più dispositivi attivi, usa il topic wildcard
-                        default_topic = "cercollettiva/+/+/value"
+                        default_topic = "cerhub/+/+/value"
                         logger.info(f"Nessun dispositivo attivo, sottoscrizione a: {default_topic}")
                         client.subscribe(default_topic)
             except Exception as mqtt_error:

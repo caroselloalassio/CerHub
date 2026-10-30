@@ -266,9 +266,9 @@ MQTT_SETTINGS = {
     'CONNECTION_TIMEOUT': 10,
     'CLEAN_SESSION': True,
     'TLS_ENABLED': False,
-    'TOPIC_PREFIX': 'CerCollettiva/',
-    'STATUS_TOPIC': 'CerCollettiva/status',
-    'ERROR_TOPIC': 'CerCollettiva/errors',
+    'TOPIC_PREFIX': 'cerhub/',
+    'STATUS_TOPIC': 'cerhub/status',
+    'ERROR_TOPIC': 'cerhub/errors',
     'DEBUG': True,
 }
 

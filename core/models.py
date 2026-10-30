@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def generate_mqtt_client_id():
     """Genera un ID client MQTT univoco"""
     import uuid
-    return f"cercollettiva-{str(uuid.uuid4())}"
+    return f"cerhub-{str(uuid.uuid4())}"
 
 class CERConfiguration(models.Model):
     """Configurazione di una Comunità Energetica Rinnovabile"""
@@ -862,8 +862,8 @@ class Plant(models.Model):
     mqtt_topic_prefix = models.CharField(
         "MQTT Topic Prefix",
         max_length=255,
-        default='cercollettiva/',
-        help_text="Prefisso per i topic MQTT (es. cercollettiva/pod_code)"
+        default='cerhub/',
+        help_text="Prefisso per i topic MQTT (es. cerhub/pod_code)"
     )
     mqtt_client_id = models.CharField(
         "MQTT Client ID",
@@ -936,7 +936,7 @@ class Plant(models.Model):
             logger.warning("[GEOCODING] Indirizzo mancante")
             return False
 
-        geolocator = Nominatim(user_agent="cercollettiva")
+        geolocator = Nominatim(user_agent="cerhub")
         geolocator.timeout = 10
 
         try:
@@ -1049,7 +1049,7 @@ class Plant(models.Model):
         
         # Imposta il topic MQTT come prima
         if not self.mqtt_topic_prefix and self.pod_code:
-            self.mqtt_topic_prefix = f"cercollettiva/{self.pod_code}"
+            self.mqtt_topic_prefix = f"cerhub/{self.pod_code}"
 
         # Prima salva l'oggetto per assicurarsi di avere un ID
         super().save(*args, **kwargs)

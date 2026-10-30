@@ -85,7 +85,7 @@ class EnergyMQTTClient:
             if not self._host:
                 raise ValueError("Host not configured. Call configure() first.")
             
-            client_id = f"CerCollettiva-{timezone.now().timestamp()}"
+            client_id = f"cerhub-{timezone.now().timestamp()}"
             self._client = mqtt.Client(client_id=client_id, clean_session=False)
             
             # Imposta timeout più breve per la connessione
@@ -107,7 +107,7 @@ class EnergyMQTTClient:
             
             # LWT
             self._client.will_set(
-                "CerCollettiva/status",
+                "cerhub/status",
                 "offline",
                 qos=1,
                 retain=True
@@ -219,7 +219,7 @@ class EnergyMQTTClient:
         if self._client:
             try:
                 self._client.publish(
-                    "CerCollettiva/status",
+                    "cerhub/status",
                     "offline",
                     qos=1,
                     retain=True
@@ -424,7 +424,7 @@ class EnergyMQTTClient:
             })
             
             self._client.publish(
-                "CerCollettiva/status",
+                "cerhub/status",
                 message,  # Ora il payload è una stringa JSON
                 qos=1,
                 retain=True

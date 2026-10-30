@@ -144,4 +144,4 @@ class MQTTConfiguration(models.Model):
 
     def generate_client_id(self):
         """Genera un ID cliente univoco per la connessione MQTT"""
-        return f"cercollettiva-{self.device.device_id}-{timezone.now().timestamp()}"
+        return f"cerhub-{self.device.device_id}-{timezone.now().timestamp()}"

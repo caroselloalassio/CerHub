@@ -18,7 +18,7 @@ class MQTTAccessControl:
             # Verifica se il topic appartiene a un impianto dell'utente
             user_plants = Plant.objects.filter(owner=cred.user)
             for plant in user_plants:
-                if topic.startswith(f"cercollettiva/{plant.pod}/"):
+                if topic.startswith(f"cerhub/{plant.pod}/"):
                     return True
             
             return False

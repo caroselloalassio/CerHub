@@ -21,12 +21,11 @@ if [ ! -f "$DATA/acl" ]; then
 
 # App CerHub: legge tutte le misure e pubblica il proprio stato
 user cerhub-app
-topic read cercollettiva/#
-topic readwrite CerCollettiva/status
-topic readwrite cercollettiva/status
+topic read cerhub/#
+topic readwrite cerhub/status
 
-# Tutti gli altri utenti (misuratori): solo sotto cercollettiva/<nome utente>/
-pattern readwrite cercollettiva/%u/#
+# Tutti gli altri utenti (misuratori): solo sotto cerhub/<nome utente>/
+pattern readwrite cerhub/%u/#
 ACL
 fi
 # Aggiunte facoltative alla configurazione
