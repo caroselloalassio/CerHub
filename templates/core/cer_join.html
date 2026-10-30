@@ -161,17 +161,23 @@
                     <hr>
                     
                     <div class="row text-center">
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="mb-2">
                                 <strong>{{ members_count|default:0 }}</strong>
                             </div>
                             <small class="text-muted">Membri</small>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <div class="mb-2">
                                 <strong>{{ plants_count|default:0 }}</strong>
                             </div>
                             <small class="text-muted">Impianti</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-2">
+                                <strong>{{ withdrawal_points_count|default:0 }}</strong>
+                            </div>
+                            <small class="text-muted">Punti di prelievo</small>
                         </div>
                     </div>
                 </div>

@@ -54,7 +54,7 @@ class CERConfigurationAdmin(admin.ModelAdmin):
 
     
     def get_members_count(self, obj):
-        return obj.members.count()
+        return obj.gse_members_count
     get_members_count.short_description = 'Numero membri'
     
     def response_add(self, request, obj, post_url_continue=None):

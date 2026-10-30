@@ -26,11 +26,8 @@ class CERListView(LoginRequiredMixin, ListView):
         queryset = CERConfiguration.objects.filter(is_active=True)
         #print(f"1. CER attive trovate: {queryset.count()}")
         
-        # Aggiunge il conteggio dei membri
-        queryset = queryset.annotate(
-            members_count=Count('members', distinct=True)
-        )
-        #print(f"2. Query finale: {queryset.query}")
+        # Il conteggio dei membri (soci con almeno un POD) lo calcola il
+        # modello: cer.gse_members_count
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -83,8 +80,9 @@ class CERPublicDetailView(LoginRequiredMixin, DetailView):
         context.update({
             'is_member': is_member,
             'distribution_config': distribution_config,
-            'members_count': cer.memberships.filter(is_active=True).count(),
-            'plants_count': cer.plants.filter(is_active=True).count(),
+            'members_count': cer.gse_members_count,
+            'plants_count': cer.production_plants_count,
+            'withdrawal_points_count': cer.withdrawal_points_count,
         })
         
         return context
@@ -251,19 +249,13 @@ class CERJoinView(BaseCERView, GDPRConsentRequiredMixin):
         context = super().get_context_data(**kwargs)
         cer = self.get_object()
         
-        # Add member and plant counts for the sidebar
-        members_count = CERMembership.objects.filter(
-            cer_configuration=cer, is_active=True
-        ).count()
-        plants_count = Plant.objects.filter(
-            cer_configuration=cer, is_active=True
-        ).count()
-        
+        # Conteggi per la barra laterale (come li intende il GSE)
         context.update({
             'cer': cer,
             'object': cer,
-            'members_count': members_count,
-            'plants_count': plants_count
+            'members_count': cer.gse_members_count,
+            'plants_count': cer.production_plants_count,
+            'withdrawal_points_count': cer.withdrawal_points_count,
         })
         
         return context

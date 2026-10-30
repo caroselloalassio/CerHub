@@ -27,12 +27,17 @@
 
                        <dt class="col-sm-4">Membri</dt>
                        <dd class="col-sm-8">
-                           <span class="badge-cer badge-cer-success">{{ cer.members.count }}</span>
+                           <span class="badge-cer badge-cer-success">{{ cer.gse_members_count }}</span>
                        </dd>
 
                        <dt class="col-sm-4">Impianti</dt>
                        <dd class="col-sm-8">
-                           <span class="badge-cer badge-cer-info">{{ cer.plants.count }}</span>
+                           <span class="badge-cer badge-cer-info">{{ cer.production_plants_count }}</span>
+                       </dd>
+
+                       <dt class="col-sm-4">Punti di prelievo</dt>
+                       <dd class="col-sm-8">
+                           <span class="badge-cer badge-cer-info">{{ cer.withdrawal_points_count }}</span>
                        </dd>
                    </dl>
                </div>

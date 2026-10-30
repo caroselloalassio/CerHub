@@ -77,6 +77,38 @@ class CERConfiguration(models.Model):
     def __str__(self):
         return f"{self.name} ({self.code})"
 
+    # Conteggi come li intende il GSE: i membri sono i soci con almeno un POD
+    # nella CER (l'iscrizione di un amministratore senza POD non conta), gli
+    # impianti sono solo quelli che producono, i punti di prelievo sono i POD
+    # che consumano (consumatori e prosumer).
+    PRODUCTION_PLANT_TYPES = ('PRODUCER', 'PROSUMER')
+    WITHDRAWAL_PLANT_TYPES = ('CONSUMER', 'PROSUMER')
+
+    def _active_plants(self):
+        return self.plants.filter(is_active=True)
+
+    @property
+    def gse_members_count(self):
+        """Soci attivi con almeno un POD attivo nella CER"""
+        owners = self._active_plants().values('owner')
+        return self.memberships.filter(
+            is_active=True, user__in=owners
+        ).values('user').distinct().count()
+
+    @property
+    def production_plants_count(self):
+        """Impianti di produzione attivi (produttori e prosumer)"""
+        return self._active_plants().filter(
+            plant_type__in=self.PRODUCTION_PLANT_TYPES
+        ).count()
+
+    @property
+    def withdrawal_points_count(self):
+        """Punti di prelievo attivi (consumatori e prosumer)"""
+        return self._active_plants().filter(
+            plant_type__in=self.WITHDRAWAL_PLANT_TYPES
+        ).count()
+
 class CERDistributionConfiguration(models.Model):
     """Configurazione della ripartizione economica della CER"""
     cer_configuration = models.OneToOneField(

@@ -66,10 +66,9 @@ def cer_power_api(request):
                 'producer_power': producer_power_kw,
                 'consumer_power': consumer_power_kw,
                 'net_power': net_power_kw,
-                'members_count': cer.memberships.filter(
-                    is_active=True
-                ).count(),
-                'plants_count': plants.count()
+                'members_count': cer.gse_members_count,
+                'plants_count': cer.production_plants_count,
+                'withdrawal_points_count': cer.withdrawal_points_count
             })
             
         return JsonResponse({
