@@ -1,6 +1,6 @@
 # core/views/fees.py
 import logging
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from django.views.generic import ListView, DetailView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404, redirect
@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -189,6 +189,10 @@ def set_membership_fee(request, card_id):
             'message': f'Quota impostata a €{amount} per {card.membership.user.username}'
         })
         
+    except Http404:
+        raise
+    except (ValueError, InvalidOperation):
+        return JsonResponse({'error': 'Dati della richiesta non validi'}, status=400)
     except Exception as e:
         logger.error(f"Errore nell'impostazione quota: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
@@ -218,6 +222,10 @@ def mark_fee_paid(request, card_id):
             'payment_date': card.fee_payment_date.strftime('%d/%m/%Y %H:%M')
         })
         
+    except Http404:
+        raise
+    except (ValueError, InvalidOperation):
+        return JsonResponse({'error': 'Dati della richiesta non validi'}, status=400)
     except Exception as e:
         logger.error(f"Errore nella registrazione pagamento: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
@@ -255,6 +263,10 @@ def bulk_set_fees(request, cer_pk):
             'updated_count': updated
         })
         
+    except Http404:
+        raise
+    except (ValueError, InvalidOperation):
+        return JsonResponse({'error': 'Dati della richiesta non validi'}, status=400)
     except Exception as e:
         logger.error(f"Errore nell'impostazione quote multiple: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
