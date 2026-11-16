@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django import forms
 from core.models import Plant
 from ..models import DeviceConfiguration, DeviceMeasurement
+from ..services.misure import energia_oggi
 from django.views.generic import ListView, CreateView, DetailView
 
 logger = logging.getLogger(__name__)
@@ -96,12 +97,8 @@ class PlantListView(LoginRequiredMixin, ListView):
                                 else None
                     })
 
-            # Calcola l'energia totale giornaliera
-            today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-            total_energy = DeviceMeasurement.objects.filter(
-                device__plant__in=plants,
-                timestamp__gte=today_start
-            ).aggregate(total=Sum('energy_total'))['total'] or 0
+            # Energia prelevata oggi (dall'energia oraria)
+            total_energy, _ = energia_oggi(DeviceConfiguration.objects.filter(plant__in=plants))
 
             logger.info(f"Daily energy consumption: {total_energy:.2f} kWh")
 
@@ -244,11 +241,8 @@ class PlantDetailView(LoginRequiredMixin, DetailView):
 
             devices_data.append(device_data)
 
-        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        total_energy = DeviceMeasurement.objects.filter(
-            device__plant=plant,
-            timestamp__gte=today_start
-        ).aggregate(total=Sum('energy_total'))['total'] or 0
+        # Energia prelevata oggi (dall'energia oraria)
+        total_energy, _ = energia_oggi(DeviceConfiguration.objects.filter(plant=plant))
 
         logger.info(f"Potenza totale calcolata: {total_power / 1000.0} kW")
         logger.info(f"Energia totale oggi: {total_energy} kWh")
@@ -405,7 +399,7 @@ def plant_mqtt_data(request, plant_id=None):
                 if device_measurement:
                     device_data.update({
                         'power': round(device_measurement.power / 1000, 2),
-                        'daily_energy': round(device_measurement.energy_total, 2),
+                        'daily_energy': round(energia_oggi([device])[0], 2),
                         'is_online': True,
                         'last_seen': device_measurement.timestamp.isoformat()
                     })
@@ -414,15 +408,12 @@ def plant_mqtt_data(request, plant_id=None):
                 devices_data.append(device_data)
 
             # Calcola energia giornaliera
-            today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-            daily_energy = DeviceMeasurement.objects.filter(
-                device__in=device_ids,
-                timestamp__gte=today_start
-            ).aggregate(total_energy=Sum('energy_total'))['total_energy'] or 0
+            daily_energy, _ = energia_oggi(DeviceConfiguration.objects.filter(pk__in=device_ids))
 
             plant_data = {
                 'drawn_power': round(total_power / 1000.0, 2),
-                'power_direction': 'prelievo' if total_power < 0 else 'immissione',
+                # Un impianto solo consumatore non produce: la potenza è sempre prelievo
+                'power_direction': 'prelievo' if (plant.plant_type == 'CONSUMER' or total_power < 0) else 'immissione',
                 'daily_energy': round(daily_energy, 2),
                 'last_update': now.isoformat(),
                 'devices': devices_data,

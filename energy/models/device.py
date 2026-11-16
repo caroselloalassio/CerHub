@@ -165,6 +165,18 @@ class DeviceConfiguration(BaseTimestampModel):
         null=True, 
         blank=True
     )
+    # Contatori del dispositivo all'ultima lettura (Wh), per calcolare l'energia oraria
+    # anche dopo un riavvio dell'app (last_energy_total = contatore del prelievo)
+    last_energy_ret_total = models.FloatField(
+        help_text="Ultimo contatore dell'energia immessa ricevuto (Wh)",
+        null=True,
+        blank=True
+    )
+    last_energy_at = models.DateTimeField(
+        help_text="Momento dell'ultima lettura dei contatori di energia",
+        null=True,
+        blank=True
+    )
     
     # Configurazione e stato
     mqtt_topic_template = models.CharField(max_length=255, blank=True, null=True)

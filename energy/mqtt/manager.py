@@ -13,6 +13,7 @@ from collections import deque
 from ..devices.registry import DeviceRegistry
 from ..devices.base.device import MeasurementData, BaseDevice
 from ..models import DeviceMeasurement, DeviceConfiguration, DeviceMeasurementDetail
+from ..services.misure import aggiungi_energia_oraria, pulisci_misure
 from .core import get_mqtt_service, MQTTMessage, TopicMatcher
 from core.models import Plant
 
@@ -38,6 +39,9 @@ class DeviceManager:
         self._devices = {}
         self._configs = {}
         self._last_energy_values = {}
+        # Potenza: letture del minuto in corso per dispositivo (si salva la media)
+        self._power_buffers = {}
+        self._last_cleanup = None
         self._message_buffer = deque(maxlen=1000)
         self._cache_timeout = 3600
         
@@ -146,109 +150,118 @@ class DeviceManager:
             logger.error(f"Errore caricamento dispositivo {config.device_id}: {e}")
 
     def _handle_power_message(self, device_config, payload, topic):
+        """Potenza: una riga al minuto con la media delle letture del minuto.
+
+        Prima si salvava una riga per ogni messaggio (circa ogni 14 secondi) più tre
+        righe di dettaglio per fase, mai lette dall'app.
+        """
         try:
-            current_timestamp = timezone.now()
-            
-            # Verifica duplicati usando una chiave più precisa
-            msg_key = f"{device_config.device_id}_{current_timestamp.timestamp()}"
-            if cache.get(msg_key):
-                logger.debug(f"Messaggio duplicato ignorato: {msg_key}")
-                return True
+            adesso = timezone.now()
+            potenza = float(payload.get('total_act_power', 0))
+            minuto = adesso.replace(second=0, microsecond=0)
+            chiave = device_config.device_id
 
-            # Estrai i valori con validazione
-            power_value = float(payload.get('total_act_power', 0))
-            energy_total = float(payload.get('total_act', 0))
-            voltage = float(payload.get('a_voltage', 0))
-            current_amp = float(payload.get('a_current', 0))
-            power_factor = float(payload.get('total_pf', 1.0))
+            with self._lock:
+                buf = self._power_buffers.get(chiave)
+                if buf and buf['minuto'] != minuto:
+                    self._salva_minuto(device_config, buf)
+                    buf = None
+                if buf is None:
+                    buf = {'minuto': minuto, 'somma': 0.0, 'conteggio': 0, 'ultimo': payload}
+                    self._power_buffers[chiave] = buf
+                buf['somma'] += potenza
+                buf['conteggio'] += 1
+                buf['ultimo'] = payload
 
-            # Salva con transazione atomica
-            with transaction.atomic():
-                measurement = DeviceMeasurement.objects.create(
-                    device=device_config,
-                    plant=device_config.plant,
-                    timestamp=current_timestamp,
-                    power=power_value,
-                    voltage=voltage,
-                    current=current_amp,
-                    power_factor=power_factor,
-                    energy_total=energy_total,
-                    measurement_type='POWER',
-                    quality='GOOD'
-                )
-
-                # Salva i dettagli delle fasi
-                self._create_phase_details(measurement, payload)
-
-                # Aggiorna last_seen
-                device_config.last_seen = current_timestamp
-                device_config.save(update_fields=['last_seen'])
-
-                # Cache del messaggio processato
-                cache.set(msg_key, True, timeout=300)
-
+            self._pulizia_periodica(adesso)
             return True
 
         except Exception as e:
             logger.error(f"Error in _handle_power_message: {str(e)}", exc_info=True)
             return False
 
-    def _handle_energy_message(self, device_config, payload, topic):
-        """Gestisce i messaggi di energia calcolando il delta tra letture consecutive"""
+    def _salva_minuto(self, device_config, buf):
+        """Salva la media della potenza di un minuto."""
+        ultimo = buf['ultimo']
+        tensioni = [float(ultimo.get(f'{fase}_voltage') or 0) for fase in 'abc']
+        attiva = float(ultimo.get('total_act_power') or 0)
+        apparente = float(ultimo.get('total_aprt_power') or 0)
+        DeviceMeasurement.objects.create(
+            device=device_config,
+            plant=device_config.plant,
+            timestamp=buf['minuto'],
+            power=buf['somma'] / buf['conteggio'],
+            voltage=max(tensioni),  # la fase collegata (con una sola fase le altre sono a 0)
+            current=float(ultimo.get('total_current') or 0),
+            power_factor=round(abs(attiva) / apparente, 3) if apparente > 0 else 1.0,
+            energy_total=0,
+            measurement_type='POWER',
+            quality='GOOD'
+        )
+
+    def _pulizia_periodica(self, adesso):
+        """Ogni 6 ore elimina le misure che non servono più."""
+        if self._last_cleanup and adesso - self._last_cleanup < timedelta(hours=6):
+            return
+        self._last_cleanup = adesso
         try:
-            current_timestamp = timezone.now()
-            
-            # Estrai il valore di energia totale dal payload (in Wh)
-            current_energy_total = float(payload.get('total_act', 0))
-            
-            # Recupera l'ultimo valore di energia per questo dispositivo
-            last_energy = self._last_energy_values.get(device_config.device_id)
-            
-            # Calcola il delta solo se abbiamo un valore precedente
-            if last_energy is not None:
-                energy_delta = current_energy_total - last_energy
-                
-                # Verifica che il delta sia positivo e ragionevole (es. max 100000 Wh = 100 kWh in 15 min)
-                if 0 <= energy_delta <= 100000:  
-                    # Crea la misurazione con il delta calcolato
-                    measurement = DeviceMeasurement.objects.create(
-                        device=device_config,
-                        plant=device_config.plant,
-                        timestamp=current_timestamp,
-                        power=0,  # Per i messaggi di energia, la potenza istantanea non è disponibile
-                        voltage=0,  # Valore di default
-                        current=0,  # Valore di default
-                        energy_total=energy_delta / 1000.0,  # Convertiamo da Wh a kWh prima di salvare
-                        measurement_type='ENERGY',
-                        quality='GOOD'
+            pulisci_misure(adesso)
+        except Exception as e:
+            logger.error(f"Errore nella pulizia delle misure: {e}", exc_info=True)
+
+    def _handle_energy_message(self, device_config, payload, topic):
+        """Energia oraria (prelievo e immissione) dai contatori totali del dispositivo.
+
+        I contatori dell'ultima lettura sono salvati nel database, quindi l'energia
+        consumata mentre l'app è ferma (aggiornamenti, riavvii) non si perde: si
+        distribuisce sulle ore del periodo. Prima si teneva solo in memoria il
+        contatore del prelievo e l'immissione era ignorata.
+        """
+        try:
+            adesso = timezone.now()
+            prelievo = payload.get('total_act')
+            if prelievo is None:
+                return False
+            prelievo = float(prelievo)
+            immissione = float(payload.get('total_act_ret') or 0)
+
+            prec_prelievo = device_config.last_energy_total
+            prec_immissione = device_config.last_energy_ret_total
+            prec_at = device_config.last_energy_at
+
+            if prec_prelievo is not None and prec_at is not None:
+                d_prelievo = prelievo - prec_prelievo
+                d_immissione = immissione - prec_immissione if prec_immissione is not None else 0.0
+                ore = max((adesso - prec_at).total_seconds() / 3600.0, 1 / 60)
+                if d_prelievo < 0 or d_immissione < 0:
+                    logger.warning(
+                        f"Contatori di {device_config.device_id} diminuiti (dispositivo azzerato?): "
+                        f"si riparte dai nuovi valori"
                     )
-                    
-                    logger.info(f"""
-                        Energy delta calculated for device {device_config.device_id}:
-                        - Previous reading: {last_energy:.3f} Wh
-                        - Current reading: {current_energy_total:.3f} Wh
-                        - Delta: {energy_delta:.3f} Wh ({energy_delta/1000.0:.3f} kWh)
-                    """)
+                elif (d_prelievo + d_immissione) / 1000.0 > 250 * ore:
+                    logger.warning(
+                        f"Salto di energia non plausibile per {device_config.device_id}: "
+                        f"{d_prelievo:.0f} Wh prelievo, {d_immissione:.0f} Wh immissione in {ore:.2f} h"
+                    )
                 else:
-                    logger.warning(f"""
-                        Invalid energy delta for device {device_config.device_id}:
-                        - Previous reading: {last_energy:.3f} Wh
-                        - Current reading: {current_energy_total:.3f} Wh
-                        - Delta: {energy_delta:.3f} Wh
-                    """)
-            else:
-                logger.info(f"First energy reading for device {device_config.device_id}: {current_energy_total:.3f} Wh")
-            
-            # Aggiorna l'ultimo valore per la prossima lettura (manteniamo il valore in Wh)
-            self._last_energy_values[device_config.device_id] = current_energy_total
-            
-            # Aggiorna il timestamp dell'ultimo dato ricevuto
-            device_config.update_last_seen()
-            
+                    aggiungi_energia_oraria(
+                        device_config, prec_at, adesso,
+                        d_prelievo / 1000.0, d_immissione / 1000.0
+                    )
+
+            # update() e non save(): non deve far partire il segnale che ricarica le configurazioni
+            DeviceConfiguration.objects.filter(pk=device_config.pk).update(
+                last_energy_total=prelievo,
+                last_energy_ret_total=immissione,
+                last_energy_at=adesso,
+            )
+            device_config.last_energy_total = prelievo
+            device_config.last_energy_ret_total = immissione
+            device_config.last_energy_at = adesso
             return True
 
         except Exception as e:
-            logger.error(f"Error processing energy message: {str(e)}")
+            logger.error(f"Error processing energy message: {str(e)}", exc_info=True)
             return False
 
     def _create_phase_details(self, measurement: DeviceMeasurement, payload: Dict[str, Any]):

@@ -11,6 +11,7 @@ import logging
 
 from ...models import Plant
 from energy.models import DeviceConfiguration, DeviceMeasurement
+from energy.services.misure import energia_oggi
 
 logger = logging.getLogger(__name__)
 
@@ -57,14 +58,8 @@ def get_plant_data(request, pk):
             timestamp__gte=time_threshold
         ).exclude(measurement_type='ENERGY').order_by('timestamp')
         
-        # Calcola energia giornaliera
-        today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-        daily_energy = DeviceMeasurement.objects.filter(
-            device=device,
-            timestamp__gte=today_start
-        ).aggregate(
-            total_energy=Sum('energy_total')
-        )['total_energy'] or 0
+        # Energia di oggi dall'energia oraria (kWh): prelievo e immissione
+        daily_energy, daily_energy_in = energia_oggi([device])
         
         # Formatta dati per il grafico
         data = [{
@@ -99,6 +94,7 @@ def get_plant_data(request, pk):
             },
             'current_power': current_power,
             'daily_energy': float(daily_energy),
+            'daily_energy_in': float(daily_energy_in),
             'last_update': last_measurement.timestamp.isoformat() if last_measurement else None
         }
         
