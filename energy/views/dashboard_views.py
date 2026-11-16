@@ -116,7 +116,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         now = timezone.now()
         time_threshold = now - timedelta(minutes=5)
 
-        plants = Plant.objects.filter(owner=self.request.user)  # Retrieve plants for the current user
+        # La pagina è riservata allo staff, che consulta dispositivi e misure di tutti
+        # (prima contava solo gli impianti di cui l'amministratore è proprietario)
+        if self.request.user.is_staff:
+            plants = Plant.objects.all()
+        else:
+            plants = Plant.objects.filter(owner=self.request.user)
+        devices_scope = DeviceConfiguration.objects.filter(plant__in=plants)
 
         logger.info("\n=== PLANT STATUS CHECK START ===")
         
@@ -136,10 +142,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                  logger.info(f"- Is active: {device.is_active}")
                  
                  # Verifica ultime misurazioni
+                 # Le righe ENERGY hanno potenza 0: per la potenza si usano solo le altre
                  last_measurement = DeviceMeasurement.objects.filter(
                      device=device,
                      timestamp__gte=time_threshold
-                 ).order_by('-timestamp').first()
+                 ).exclude(measurement_type='ENERGY').order_by('-timestamp').first()
 
                  if last_measurement:
                      logger.info(f"  Ultima misurazione:")
@@ -177,14 +184,13 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'active_devices': total_active,
                 'online_devices': online_count,
                 'online_percentage': int((online_count / total_active * 100) if total_active > 0 else 0),
-                'new_devices':  DeviceConfiguration.objects.filter(plant__owner=self.request.user,
+                'new_devices':  devices_scope.filter(
                     created_at__gte=now - timedelta(days=1)
                 ).count()
             }
 
             # Query ottimizzata per i tipi di dispositivo
-            device_types = (DeviceConfiguration.objects
-                        .filter(plant__owner=self.request.user)
+            device_types = (devices_scope
                         .values('vendor', 'model')
                         .annotate(count=Count('id'))
                         .filter(count__gt=0)
@@ -196,7 +202,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'system_alerts': [],
                 'mqtt_stats': {
                     'messages': DeviceMeasurement.objects.filter(
-                        device__plant__owner=self.request.user
+                        device__in=devices_scope
                     ).count(),
                     'errors': 0,
                     'status': mqtt_status

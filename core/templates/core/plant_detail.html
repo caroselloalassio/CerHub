@@ -296,6 +296,8 @@ canvas {
 
 <script>
 const PLANT_ID = {{ plant.pk }};
+// Un impianto solo consumatore non produce: ogni potenza misurata è prelievo dalla rete
+const IS_CONSUMER_ONLY = "{{ plant.plant_type }}" === "CONSUMER";
 
 class PowerChartManager {
     constructor(plantId) {
@@ -353,7 +355,7 @@ class PowerChartManager {
                                 if (context.parsed.y === undefined) return 'Valore non disponibile';
                                 
                                 const value = context.parsed.y;
-                                const sign = value < 0 ? 'Prelievo' : 'Immissione';
+                                const sign = (IS_CONSUMER_ONLY || value < 0) ? 'Prelievo' : 'Immissione';
                                 return `${sign}: ${Math.abs(value).toFixed(2)} kW`;
                             }
                         }
@@ -554,7 +556,7 @@ class PowerChartManager {
             document.getElementById('current-power').textContent = `${powerValue.toFixed(2)} kW`;
             
             const directionEl = document.getElementById('power-direction');
-            const isConsumption = data.current_power < 0;
+            const isConsumption = IS_CONSUMER_ONLY || data.current_power < 0;
             directionEl.className = `badge-cer ${isConsumption ? 'badge-cer-warning' : 'badge-cer-success'}`;
             directionEl.textContent = isConsumption ? 'Prelievo' : 'Immissione';
         } else {

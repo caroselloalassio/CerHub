@@ -41,10 +41,11 @@ def cer_power_api(request):
             for plant in plants:
                 device = plant.devices.first()
                 if device:
+                    # Le righe ENERGY hanno potenza 0: si usano solo le altre
                     measurement = DeviceMeasurement.objects.filter(
                         device=device,
                         timestamp__gte=time_threshold
-                    ).order_by('-timestamp').first()
+                    ).exclude(measurement_type='ENERGY').order_by('-timestamp').first()
                     
                     if measurement:
                         if plant.plant_type == 'PRODUCER' and measurement.power > 0:

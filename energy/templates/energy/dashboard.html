@@ -105,7 +105,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         MQTT Broker
-                        <span class="badge-cer {% if mqtt_stats.status == 'Online' %}badge-cer-success{% else %}badge-cer-danger{% endif %}">
+                        <span class="badge-cer {% if mqtt_stats.status == 'Connesso' %}badge-cer-success{% else %}badge-cer-danger{% endif %}">
                             {{ mqtt_stats.status }}
                         </span>
                     </li>

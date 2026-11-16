@@ -6,7 +6,7 @@
 <div class="toast-container position-fixed top-0 end-0 p-3"></div>
 
 <!-- Container principale -->
-<div class="plant-detail" data-plant-id="{{ plant.id }}" data-csrf-token="{{ csrf_token }}">
+<div class="plant-detail" data-plant-id="{{ plant.id }}" data-plant-type="{{ plant.plant_type }}" data-csrf-token="{{ csrf_token }}">
     <!-- Header con stato impianto -->
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <div class="d-flex align-items-center">
@@ -279,8 +279,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         powerValue.textContent = formatNumber(Math.abs(powerNum));
-        powerDirection.className = `ms-2 badge ${powerNum < 0 ? 'bg-warning' : 'bg-success'}`;
-        powerDirection.textContent = powerNum < 0 ? 'Prelievo' : 'Immissione';
+        // Un impianto solo consumatore non produce: ogni potenza misurata è prelievo dalla rete
+        const isConsumerOnly = document.querySelector('.plant-detail').dataset.plantType === 'CONSUMER';
+        const isDraw = isConsumerOnly || powerNum < 0;
+        powerDirection.className = `ms-2 badge ${isDraw ? 'bg-warning' : 'bg-success'}`;
+        powerDirection.textContent = isDraw ? 'Prelievo' : 'Immissione';
 
         if (previousPower !== null) {
             const trend = ((powerNum - previousPower) / Math.abs(previousPower)) * 100;

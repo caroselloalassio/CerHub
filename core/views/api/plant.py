@@ -46,15 +46,16 @@ def get_plant_data(request, pk):
             }, status=404)
             
         # Recupera ultima misurazione per potenza attuale
+        # Le righe ENERGY hanno potenza 0: per potenza e grafico si usano solo le altre
         last_measurement = DeviceMeasurement.objects.filter(
             device=device
-        ).order_by('-timestamp').first()
+        ).exclude(measurement_type='ENERGY').order_by('-timestamp').first()
         
         # Recupera misurazioni per il grafico
         measurements = DeviceMeasurement.objects.filter(
             device=device,
             timestamp__gte=time_threshold
-        ).order_by('timestamp')
+        ).exclude(measurement_type='ENERGY').order_by('timestamp')
         
         # Calcola energia giornaliera
         today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
